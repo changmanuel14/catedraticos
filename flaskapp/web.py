@@ -107,7 +107,7 @@ def nuevocatedratico():
 			conexion.close()
 	except (pymysql.err.OperationalError, pymysql.err.InternalError) as e:
 		print("Ocurrió un error al conectar: ", e)
-	
+
 	if request.method == 'POST':
 		nombre = request.form["nombre"]
 		apellido = request.form["apellido"]
@@ -153,12 +153,12 @@ def editarcatedratico(id):
 
 	#Generate barcode and render as image
 	my_barcode = barcode_format(number, writer=ImageWriter())
-	
+
 	#Save barcode as PNG
-	aux = "flaskapp\\static\\barcodes\\" + catedratico[0] + '_' + catedratico[1]
+	aux = "static/barcodes/" + catedratico[0] + '_' + catedratico[1]
 	my_barcode.save(aux)
 
-	
+
 	if request.method == 'POST':
 		nombre = request.form["nombre"]
 		apellido = request.form["apellido"]
@@ -193,7 +193,7 @@ def eliminarcatedratico(id):
 			conexion.close()
 	except (pymysql.err.OperationalError, pymysql.err.InternalError) as e:
 		print("Ocurrió un error al conectar: ", e)
-	
+
 	return redirect(url_for('catedraticos'))
 
 @app.route('/periodos')
@@ -217,7 +217,7 @@ def nuevaclase():
 			conexion.close()
 	except (pymysql.err.OperationalError, pymysql.err.InternalError) as e:
 		print("Ocurrió un error al conectar: ", e)
-	
+
 	if request.method == 'POST':
 		curso = request.form["curso"]
 		carrera = request.form["carrera"]
@@ -257,7 +257,7 @@ def nuevaclase():
 							consulta = "INSERT INTO periodos(idclase,fecha,idestado, liquidado, precio, formadepago) VALUES (%s,%s,%s,%s,%s,%s);"
 							cursor.execute(consulta, (idclase, aux, 1, 0, precio, formadepago))
 							aux = aux + datetime.timedelta(days=7)
-						conexion.commit() 
+						conexion.commit()
 
 
 			finally:
@@ -290,7 +290,7 @@ def editarclase(id):
 			conexion.close()
 	except (pymysql.err.OperationalError, pymysql.err.InternalError) as e:
 		print("Ocurrió un error al conectar: ", e)
-	
+
 	if request.method == 'POST':
 		curso = request.form["curso"]
 		seccion = request.form["seccion"]
@@ -391,9 +391,9 @@ def periodoscat(id):
 
 	#Generate barcode and render as image
 	my_barcode = barcode_format(number, writer=ImageWriter())
-	
+
 	#Save barcode as PNG
-	aux = "flaskapp\\static\\barcodes\\" + catedratico[1] + '_' + catedratico[2]
+	aux = "static/barcodes/" + catedratico[1] + '_' + catedratico[2]
 	my_barcode.save(aux)
 	return render_template('periodoscat.html', title="Periodos por Catedrático", catedratico=catedratico, clases = clases, clasesdias = clasesdias, dias=dias)
 
@@ -512,9 +512,9 @@ def registroper(id):
 
 	#Generate barcode and render as image
 	my_barcode = barcode_format(number, writer=ImageWriter())
-	
+
 	#Save barcode as PNG
-	aux = "flaskapp\\static\\barcodes\\" + catedratico[1] + '_' + catedratico[2]
+	aux = "static/barcodes/" + catedratico[1] + '_' + catedratico[2]
 	my_barcode.save(aux)
 	if request.method == 'POST':
 		try:
@@ -530,7 +530,7 @@ def registroper(id):
 						estado = request.form[aux]
 						consulta = "UPDATE periodos set idestado = " + str(estado) + ", fecharegistro = CURDATE() where idperiodos = " +str(i[0])
 						cursor.execute(consulta)
-				conexion.commit() 
+				conexion.commit()
 			finally:
 				conexion.close()
 		except (pymysql.err.OperationalError, pymysql.err.InternalError) as e:
@@ -559,7 +559,7 @@ def montofacturar():
 					cursor.execute(consulta, (i[0],i[4], mes, mes+1))
 					totalmes = cursor.fetchone()
 					try:
-						totalmes = float(totalmes[0]) 
+						totalmes = float(totalmes[0])
 					except:
 						totalmes = 0
 					try:
@@ -598,7 +598,7 @@ def montofacturarpdf():
 					cursor.execute(consulta, (i[0],i[4], mes, mes+1))
 					totalmes = cursor.fetchone()
 					try:
-						totalmes = float(totalmes[0]) 
+						totalmes = float(totalmes[0])
 					except:
 						totalmes = 0
 					try:
@@ -644,7 +644,7 @@ def montofacturarexcel():
 					cursor.execute(consulta, (i[0],i[4], mes, mes+1))
 					totalmes = cursor.fetchone()
 					try:
-						totalmes = float(totalmes[0]) 
+						totalmes = float(totalmes[0])
 					except:
 						totalmes = 0
 					try:
@@ -694,7 +694,7 @@ def montofacturarexcel():
 	tittle_style = xlwt.XFStyle()
 	tittle_style.font = tittle_font
 
-	
+
 
 	sh.write(0,0,"Montos a Facturar", tittle_style)
 
@@ -714,7 +714,7 @@ def montofacturarexcel():
 		sh.write(i+4,4,data[i][0], content_style)
 		sh.write(i+4,5,data[i][1], content_style)
 		sh.write(i+4,6,data[i][2], content_style)
-	
+
 	sh.col(0).width = 18 * 256
 	sh.col(1).width = 24 * 256
 	sh.col(2).width = 28 * 256
@@ -770,9 +770,9 @@ def montofact(id):
 
 	#Generate barcode and render as image
 	my_barcode = barcode_format(number, writer=ImageWriter())
-	
+
 	#Save barcode as PNG
-	aux = "flaskapp\\static\\barcodes\\" + catedratico[1] + '_' + catedratico[2]
+	aux = "static/barcodes/" + catedratico[1] + '_' + catedratico[2]
 	my_barcode.save(aux)
 	if request.method == 'POST':
 		for i in range(12):
@@ -800,12 +800,12 @@ def montofact(id):
 										consulta = "UPDATE periodos set liquidado = 1, factura = %s where idperiodos = %s"
 										cursor.execute(consulta, (auxfacturai, j[0]))
 										conexion.commit()
-								
+
 				finally:
 					conexion.close()
 			except (pymysql.err.OperationalError, pymysql.err.InternalError) as e:
 				print("Ocurrió un error al conectar: ", e)
-			
+
 		return redirect(url_for('montofacturar'))
 	return render_template('montofact.html', title="Monto a Facturar", catedratico=catedratico, periodosmeses = periodosmeses, meses=meses, totales = totales)
 
@@ -931,9 +931,9 @@ def catedraticohistorico(id):
 
 	#Generate barcode and render as image
 	my_barcode = barcode_format(number, writer=ImageWriter())
-	
+
 	#Save barcode as PNG
-	aux = "flaskapp\\static\\barcodes\\" + catedratico[1] + '_' + catedratico[2]
+	aux = "static/barcodes/" + catedratico[1] + '_' + catedratico[2]
 	my_barcode.save(aux)
 	if request.method == 'POST':
 		boton = request.form["varaux"]
@@ -945,7 +945,7 @@ def catedraticohistorico(id):
 				try:
 					with conexion.cursor() as cursor:
 						consulta = """SELECT c.nombre, DATE_FORMAT(p.fecha,'%d/%m/%Y'), c.horainicio, c.horafin, a.codigo, c.seccion, p.precio, p.idestado, p.liquidado, p.factura, p.cheque, p.idperiodos, p.formadepago
-						from clase c inner join periodos p on c.idclase = p.idclase inner join carrera a on a.idcarrera = c.idcarrera inner join estado e on e.idestado = p.idestado 
+						from clase c inner join periodos p on c.idclase = p.idclase inner join carrera a on a.idcarrera = c.idcarrera inner join estado e on e.idestado = p.idestado
 						where p.fecha >= '""" + str(desde) + "' and p.fecha <= '" + str(hasta)
 						consulta = consulta + "' and c.idcatedratico = " + str(id) + " order by p.fecha, c.horainicio asc"
 						cursor.execute(consulta)
@@ -961,7 +961,7 @@ def catedraticohistorico(id):
 				try:
 					with conexion.cursor() as cursor:
 						consulta = """SELECT c.nombre, DATE_FORMAT(p.fecha,'%d/%m/%Y'), c.horainicio, c.horafin, a.codigo, c.seccion, p.precio, p.idestado, p.liquidado, p.factura, p.cheque, p.idperiodos, p.formadepago
-						from clase c inner join periodos p on c.idclase = p.idclase inner join carrera a on a.idcarrera = c.idcarrera inner join estado e on e.idestado = p.idestado 
+						from clase c inner join periodos p on c.idclase = p.idclase inner join carrera a on a.idcarrera = c.idcarrera inner join estado e on e.idestado = p.idestado
 						where p.fecha >= '""" + str(desde) + "' and p.fecha <= '" + str(hasta)
 						consulta = consulta + "' and c.idcatedratico = " + str(id) + " order by p.fecha, c.horainicio asc"
 						cursor.execute(consulta)
@@ -975,7 +975,7 @@ def catedraticohistorico(id):
 							cursor.execute(consulta)
 							conexion.commit()
 						consulta = """SELECT c.nombre, DATE_FORMAT(p.fecha,'%d/%m/%Y'), c.horainicio, c.horafin, a.codigo, c.seccion, p.precio, p.idestado, p.liquidado, p.factura, p.cheque, p.idperiodos, p.formadepago
-						from clase c inner join periodos p on c.idclase = p.idclase inner join carrera a on a.idcarrera = c.idcarrera inner join estado e on e.idestado = p.idestado 
+						from clase c inner join periodos p on c.idclase = p.idclase inner join carrera a on a.idcarrera = c.idcarrera inner join estado e on e.idestado = p.idestado
 						where p.fecha >= '""" + str(desde) + "' and p.fecha <= '" + str(hasta)
 						consulta = consulta + "' and c.idcatedratico = " + str(id) + " order by p.fecha, c.horainicio asc"
 						cursor.execute(consulta)
