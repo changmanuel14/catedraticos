@@ -1,0 +1,48 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div style="width: 70%; float: left;">
+	<h1>Periodos</h1>
+	<h2>{{catedratico[5]}} {{catedratico[1]}} {{catedratico[2]}}</h2>
+	<h4>{{catedratico[3]}}</h4>
+	<h4>{{catedratico[4]}}</h4>
+</div>
+
+<div style="width: 25%; float: right;">
+	<img src="/static/barcodes/{{catedratico[1]}}_{{catedratico[2]}}.png" width="100%"> 
+</div>
+<br><br><br><br><br><br><br><br>
+
+<a href="/periodoscatpdf/{{catedratico[0]}}"  target="_blank"><button class="btn btn-info">Exportar PDF</button></a>
+<br>
+
+<table class="table table-striped sortable" style="border:1px rgb(174, 172, 172) solid;">
+	{% for i in clasesdias %}
+	{% if i[1] > 0 %}
+	<tr>
+		<th style="border:1px rgb(174, 172, 172) solid; vertical-align: middle; text-align: center;">{{dias[i[0]][1]}}</th>
+	{% for j in clases %}
+	{% if j[6] == i[0] %}
+		<td style="border:1px rgb(174, 172, 172) solid;">
+			{{j[0]}}<br>
+			{{j[1]}} - {{j[2]}}<br>
+			{{j[3]}} - {{j[4]}}<br>
+			{{j[5]}} {{j[7]}}<br>
+			{% if j[8] == 0 %}
+			Virtual
+			{% elif j[8] == 1 %}
+			Presencial
+			{% endif %}
+			<br>
+			{{j[9]}}
+			<br>
+			<a href="/editarclase/{{j[10]}}">Editar información</a>
+		</td>
+	{% endif %}
+	{% endfor %}
+	</tr>
+	{% endif %}
+	{% endfor %}
+</table>
+
+{% endblock %}

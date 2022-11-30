@@ -1,0 +1,52 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div style="width: 70%; float: left;">
+	<h1>Editar Catedratico</h1>
+</div>
+
+<div style="width: 25%; float: right;">
+	<img src="/static/barcodes/{{catedratico[0]}}_{{catedratico[1]}}.png" width="100%"> 
+</div>
+<br><br><br><br><br><br><br>
+
+<form action="" method="POST">
+    <div class="form-row">
+        <div class="form-group col-md-6">
+          <label for="nombre">Nombre</label>
+          <input type="text" class="form-control" id="nombre" name="nombre" placeholder="Nombre" value="{{catedratico[0]}}">
+        </div>
+        <div class="form-group col-md-6">
+          <label for="apellido">Apellido</label>
+          <input type="text" class="form-control" id="apellido" name="apellido" placeholder="Apellido" value="{{catedratico[1]}}">
+        </div>
+      </div>
+	  <div class="form-row">
+        <div class="form-group col-md-6">
+          <label for="telefono">Teléfono</label>
+          <input type="number" class="form-control" id="telefono" name="telefono" placeholder="Teléfono"  value="{{catedratico[3]}}">
+        </div>
+        <div class="form-group col-md-6">
+          <label for="correo">Correo</label>
+          <input type="email" class="form-control" id="correo" name="correo" placeholder="Correo"  value="{{catedratico[4]}}">
+        </div>
+      </div>
+      <div class="form-row">
+      <div class="form-group col-md-6">
+        <label for="nivel">Grado Académico</label>
+        <select id="nivel" name="nivel" class="form-control">
+          <option selected>Seleccione el grado académico que posea</option>
+          {% for i in niveles %}
+          {% if i[0] == catedratico[2] %}
+          <option value="{{i[0]}}" selected>{{i[1]}}</option>
+          {% else %}
+          <option value="{{i[0]}}">{{i[1]}}</option>
+          {% endif %}
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+      <button type="submit" class="btn btn-primary">Aceptar</button>
+</form>
+
+{% endblock %}

@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+{% block content %}
+<center>
+	<h1>Bienvenido</h1>
+	<h2>Control de Catedraticos y Periodos</h2>
+	<br><br><br>
+	<h3 style="color: red;">{{mensaje}}</h3>
+	<form action="" method="POST">
+		<div class="form-row">
+			<div class="form-group col-md-12">
+			  <label for="codigo">Lectura de Código de Barras</label>
+			  <input type="text" id="codigo" name="codigo" class="form-control" required placeholder="Código de Barras" autofocus>
+			</div>
+		  </div>
+        
+        <br>
+        <button onclick="submit" class="button">Aceptar</button>
+        <br>
+        <hr>
+      </form>
+</center>
+
+{% endblock %}

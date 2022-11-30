@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<h1>Registrar periodos</h1>
+<table class="table table-striped sortable">
+	<tr>
+		<th>Grado<br>académico</th>
+		<th>Nombre</th>
+		<th>Apellido</th>
+		<th>Opciones</th>
+	</tr>
+	{% for i in catedraticos %}
+	
+		<tr>
+			<td>{{i[3]}}</td>
+			<td>{{i[1]}}</td>
+			<td>{{i[2]}}</td>
+			<td><a href="/registroper/{{i[0]}}"><button class="btn btn-info">Registrar</button></a></td>
+		</tr>
+	
+	{% endfor %}
+
+</table>
+
+{% endblock %}

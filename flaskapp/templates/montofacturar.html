@@ -1,0 +1,35 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<h1>Montos a Facturar</h1>
+<a href="/montofacturarpdf" target="_blank"><button class="btn btn-info">Exportar PDF</button></a>  <a href="/montofacturarexcel"><button class="btn btn-info">Exportar Excel</button></a>
+<table class="table table-striped sortable">
+	<tr>
+		<th>Grado<br>académico</th>
+		<th>Nombre</th>
+		<th>Apellido</th>
+		<th>Forma de Pago</th>
+		<th>Acumulado</th>
+		<th>Mes Actual</th>
+		<th>Total</th>
+		<th>Opciones</th>
+	</tr>
+	{% for i in range(cantidad) %}
+	
+		<tr>
+			<td>{{catedraticos[i][3]}}</td>
+			<td>{{catedraticos[i][1]}}</td>
+			<td>{{catedraticos[i][2]}}</td>
+			<td>{{catedraticos[i][4]}}</td>
+			<td>{{data[i][0]}}</td>
+			<td>{{data[i][1]}}</td>
+			<td>{{data[i][2]}} </td>
+
+			<td><a href="/montofact/{{catedraticos[i][0]}}"><button class="btn btn-info">Ver Montos</button></a></td>
+		</tr>
+	
+	{% endfor %}
+
+</table>
+
+{% endblock %}

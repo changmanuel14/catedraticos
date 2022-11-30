@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        {% if title %}
+        <title>{{ title }} - Control de Catedraticos</title>
+        {% else %}
+        <title>Control de Catedraticos</title>
+        {% endif %}
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        <script src="https://www.kryogenix.org/code/browser/sorttable/sorttable.js"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='main.css') }}">
+    </head>
+    <body>
+        <header>
+            <div class="inner-width">
+                <a href="/" style="color: white;"><h1>Control de Periodos</h1></a>
+                <div class="menu-icon">
+                    <i class="fas fa-bars"></i>
+                </div>
+            </div>
+        </header>
+        <div class="navigation-menu">
+            <nav>
+                <li><a href="/">Inicio</a></li>
+                <li><a href="/catedraticos">Catedraticos</a></li>
+                <li><a href="/periodos">Periodos</a></li>
+            </nav>
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }}">
+                                    {{ message }}
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+                    {% block content %}{% endblock %}
+                </div>
+            </div>
+        </div>
+        <br><br><br><br>
+        <script>
+            $(".menu-icon").click(function () {
+                $(this).toggleClass("active");
+                $(".navigation-menu").toggleClass("active");
+                $(".menu-icon i").toggleClass("fa-times");
+            });
+        </script>
+    </body>
+</html>

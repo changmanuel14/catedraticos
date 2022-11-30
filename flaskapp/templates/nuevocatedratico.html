@@ -1,0 +1,41 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<h1>Nuevo Catedratico</h1>
+
+<form action="" method="POST">
+    <div class="form-row">
+        <div class="form-group col-md-6">
+          <label for="nombre">Nombre</label>
+          <input type="text" class="form-control" id="nombre" name="nombre" placeholder="Nombre">
+        </div>
+        <div class="form-group col-md-6">
+          <label for="apellido">Apellido</label>
+          <input type="text" class="form-control" id="apellido" name="apellido" placeholder="Apellido">
+        </div>
+      </div>
+	  <div class="form-row">
+        <div class="form-group col-md-6">
+          <label for="telefono">Teléfono</label>
+          <input type="number" class="form-control" id="telefono" name="telefono" placeholder="Teléfono">
+        </div>
+        <div class="form-group col-md-6">
+          <label for="correo">Correo</label>
+          <input type="email" class="form-control" id="correo" name="correo" placeholder="Correo">
+        </div>
+      </div>
+      <div class="form-row">
+      <div class="form-group col-md-6">
+        <label for="nivel">Grado Académico</label>
+        <select id="nivel" name="nivel" class="form-control">
+          <option selected>Seleccione el grado académico que posea</option>
+          {% for i in niveles %}
+          <option value="{{i[0]}}">{{i[1]}}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+      <button type="submit" class="btn btn-primary">Aceptar</button>
+</form>
+
+{% endblock %}

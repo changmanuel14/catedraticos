@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<h1>Catedraticos</h1>
+<a href="/nuevocatedratico"><button type="button" class="btn btn-success">Nuevo Catedratico</button></a>
+
+<table class="table table-striped sortable">
+    <tr>
+        <th>Profesión</th>
+        <th>Nombre</th>
+        <th>Apellido</th>
+        <th colspan="2">Opciones</th>
+    </tr>
+    {% for i in catedraticos %}
+    <tr>
+        <td>{{i[2]}}</td>
+        <td>{{i[0]}}</td>
+        <td>{{i[1]}}</td>
+        <td><a href="/editarcatedratico/{{i[3]}}"><button type="button" class="btn btn-primary">Editar</button></a></td>
+        <td><a href="/eliminarcatedratico/{{i[3]}}"><button type="button" class="btn btn-danger">Eliminar</button></a></td>
+    </tr>
+    {% endfor %}
+</table>
+
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<h1>Historico</h1>
+<table class="table table-striped sortable">
+	<tr>
+		<th>Grado<br>académico</th>
+		<th>Nombre</th>
+		<th>Apellido</th>
+		<th>Opciones</th>
+	</tr>
+	{% for i in catedraticos %}
+	
+		<tr>
+			<td>{{i[3]}}</td>
+			<td>{{i[1]}}</td>
+			<td>{{i[2]}}</td>
+			<td><a href="/catedraticohistorico/{{i[0]}}"><button class="btn btn-info">Ver historial</button></a></td>
+		</tr>
+	
+	{% endfor %}
+
+</table>
+
+{% endblock %}

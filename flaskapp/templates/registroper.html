@@ -1,0 +1,90 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div style="width: 70%; float: left;">
+	<h1>Periodos</h1>
+	<h2>{{catedratico[5]}} {{catedratico[1]}} {{catedratico[2]}}</h2>
+	<h4>{{catedratico[3]}}</h4>
+	<h4>{{catedratico[4]}}</h4>
+</div>
+
+<div style="width: 25%; float: right;">
+	<img src="/static/barcodes/{{catedratico[1]}}_{{catedratico[2]}}.png" width="100%"> 
+</div>
+<br><br><br><br><br><br><br><br>
+
+<form action="" method="POST">
+	<table class="table table-striped sortable">
+		<tr>
+			<th>Nombre</th>
+			<th>Fecha</th>
+			<th>Hora Inicio</th>
+			<th>Hora Fin</th>
+			<th>Carrera</th>
+			<th>Sección</th>
+			<th>Modalidad</th>
+			<th>Estado</th>
+		</tr>
+{% for i in meses %}
+{% if periodosmeses[i[0]-1][1] > 0 %}
+	<tr>
+		<th colspan="8"><center>{{i[1]}}</center></th>
+	</tr>
+	{% for j in periodosmeses[i[0]-1][2] %}
+	<tr>
+		<td>{{j[0]}}</td>
+		<td>{{j[4]}}</td>
+		<td>{{j[1]}}</td>
+		<td>{{j[2]}}</td>
+		<td>{{j[3]}}</td>
+		<td>{{j[7]}}</td>
+		<td>
+			{% if j[8] == 0 %}
+			Virtual
+			{% elif j[8] == 1 %}
+			Presencial
+			{% endif %}
+		</td>
+		<td>
+			<div class="form-group col-md-12">
+				<select name="estado{{j[5]}}" id="estado{{j[5]}}" class="form-control" onchange="contar()">
+				  {% for k in estados %}
+				  {% if j[6] == k[0] %}
+				  <option value="{{k[0]}}" selected>{{k[1]}}</option>
+				  {% else %}
+				  <option value="{{k[0]}}">{{k[1]}}</option>
+				  {% endif %}
+				  {% endfor %}
+				</select>
+			  </div>
+		</td>
+	</tr>
+	{% endfor %}
+
+{% endif %}
+{% endfor %}
+</table>
+<h4 id="conteo">Periodos Registrados: 0</h4>
+<button type="submit" class="btn btn-primary">Aceptar</button>
+</form>
+
+<script type="text/javascript">
+	function contar(){
+		var arreglo = {{ validar|tojson|safe }};
+		var cont = 0
+		var etiqueta = document.getElementById('conteo')
+		for(var i = 0; i<arreglo.length;i++){
+			var aux = 'estado' + String(arreglo[i][0])
+			if(document.getElementById(aux).value == 2){
+				cont++;
+			}
+		}
+		etiqueta.innerHTML = 'Periodos Registrados: ' + String(cont)
+	  }
+	  
+  </script>
+
+
+
+
+{% endblock %}
