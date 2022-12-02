@@ -13,6 +13,18 @@
         <script src="https://www.kryogenix.org/code/browser/sorttable/sorttable.js"></script>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='main.css') }}">
+        <style>
+        @page {
+            size: letter;
+            margin: 2cm;
+        }
+        td, th, table {
+              border: 1px rgb(174, 172, 172) solid;
+        }
+        th {
+            text-align: center;
+        }
+</style>
     </head>
     <body>
         <div class="container">

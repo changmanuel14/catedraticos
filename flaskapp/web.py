@@ -1,13 +1,11 @@
-from flask import Flask, Response, render_template, request, url_for, redirect, make_response, session
+from flask import Flask, Response, render_template, request, url_for, redirect, make_response
 import pymysql
 import datetime
-import os
-import webbrowser
 import io
 import xlwt
-import pdfkit as pdfkit
 import barcode
 from barcode.writer import ImageWriter
+from flask_weasyprint import HTML, render_pdf
 
 app = Flask(__name__)
 app.secret_key = 'd589d3d0d15d764ed0a98ff5a37af547'
@@ -36,12 +34,12 @@ def presenciales(idcatedratico):
 				cursor.execute(consulta, idcatedratico)
 				banderin = cursor.fetchall()
 				if len(banderin) > 0:
-					consulta = "select p.idperiodos, c.nombre, c.horainicio, c.horafin, DATE_FORMAT(p.fecha,'%d/%m/%Y'), a.codigo, c.seccion, c.modalidad from periodos p inner join clase c on p.idclase = c.idclase inner join carrera a on a.idcarrera = c.idcarrera where c.modalidad = 1 and p.idestado = 7 and c.idcatedratico = " +str(idcatedratico) + " and AddTime(CURTIME(), '00:15:00') > c.horafin and p.fecha = CURDATE() order by c.horainicio asc;"
+					consulta = "select p.idperiodos, c.nombre, c.horainicio, c.horafin, DATE_FORMAT(p.fecha,'%d/%m/%Y'), a.codigo, c.seccion, c.modalidad from periodos p inner join clase c on p.idclase = c.idclase inner join carrera a on a.idcarrera = c.idcarrera where c.modalidad = 1 and p.idestado = 7 and c.idcatedratico = " +str(idcatedratico) + " and CURTIME() > c.horafin and p.fecha = CURDATE() order by c.horainicio asc;"
 					estado = 1
 					print(consulta)
 					cursor.execute(consulta)
 				else:
-					consulta = "select p.idperiodos, c.nombre, c.horainicio, c.horafin, DATE_FORMAT(p.fecha,'%d/%m/%Y'), a.codigo, c.seccion, c.modalidad from periodos p inner join clase c on p.idclase = c.idclase inner join carrera a on a.idcarrera = c.idcarrera where c.modalidad = 1 and p.idestado = 1 and c.idcatedratico = " +str(idcatedratico) + " and AddTime(c.horainicio, '00:15:00') > CURTIME() and p.fecha = CURDATE() order by c.horainicio asc;"
+					consulta = "select p.idperiodos, c.nombre, c.horainicio, c.horafin, DATE_FORMAT(p.fecha,'%d/%m/%Y'), a.codigo, c.seccion, c.modalidad from periodos p inner join clase c on p.idclase = c.idclase inner join carrera a on a.idcarrera = c.idcarrera where c.modalidad = 1 and p.idestado = 1 and c.idcatedratico = " +str(idcatedratico) + " and AddTime(c.horainicio, '00:10:00') > CURTIME() and p.fecha = CURDATE() order by c.horainicio asc;"
 					estado = 0
 					print(consulta)
 					cursor.execute(consulta)
@@ -424,16 +422,9 @@ def periodoscatpdf(id):
 			conexion.close()
 	except (pymysql.err.OperationalError, pymysql.err.InternalError) as e:
 		print("Ocurrió un error al conectar: ", e)
-	rendered = render_template('periodoscatpdf.html', title="Horario Catedratico", catedratico=catedratico, clases = clases, clasesdias = clasesdias, dias=dias)
-	options = {'enable-local-file-access': None}
-	config = pdfkit.configuration(wkhtmltopdf="C:\\Program Files\\wkhtmltopdf\\bin\\wkhtmltopdf.exe")
-	pdf = pdfkit.from_string(rendered, False, configuration=config, options=options)
-	response = make_response(pdf)
-	response.headers['Content-Type'] = 'application/pdf'
-	aux = 'inline; filename=Horario ' + str(catedratico[1]) + ' ' + str(catedratico[2]) + '.pdf'
-	response.headers['Content-Disposition'] = aux
-	print(response)
-	return response
+
+	html = render_template('periodoscatpdf.html', title="Horario Catedratico", catedratico=catedratico, clases = clases, clasesdias = clasesdias, dias=dias)
+	return render_pdf(HTML(string=html))
 
 @app.route('/nuevacarrera', methods=['GET', 'POST'])
 def nuevacarrera():
@@ -613,15 +604,8 @@ def montofacturarpdf():
 			conexion.close()
 	except (pymysql.err.OperationalError, pymysql.err.InternalError) as e:
 		print("Ocurrió un error al conectar: ", e)
-	rendered = render_template('montofacturarpdf.html', title="Montos a Facturar", catedraticos=catedraticos, data = data, cantidad = cantidad)
-	options = {'enable-local-file-access': None}
-	config = pdfkit.configuration(wkhtmltopdf="C:\\Program Files\\wkhtmltopdf\\bin\\wkhtmltopdf.exe")
-	pdf = pdfkit.from_string(rendered, False, configuration=config, options=options)
-	response = make_response(pdf)
-	response.headers['Content-Type'] = 'application/pdf'
-	response.headers['Content-Disposition'] = 'inline; filename=montofacturar.pdf'
-	print(response)
-	return response
+	html = render_template('montofacturarpdf.html', title="Montos a Facturar", catedraticos=catedraticos, data = data, cantidad = cantidad)
+	return render_pdf(HTML(string=html))
 
 @app.route('/montofacturarexcel', methods=['GET', 'POST'])
 def montofacturarexcel():
@@ -877,16 +861,9 @@ def reportepdf(id):
 			conexion.close()
 	except (pymysql.err.OperationalError, pymysql.err.InternalError) as e:
 		print("Ocurrió un error al conectar: ", e)
-	rendered = render_template('reportepdf.html', title="Monto a Facturar", catedratico=catedratico, periodosmeses = periodosmeses, meses=meses, totales = totales)
-	options = {'enable-local-file-access': None}
-	config = pdfkit.configuration(wkhtmltopdf="C:\\Program Files\\wkhtmltopdf\\bin\\wkhtmltopdf.exe")
-	pdf = pdfkit.from_string(rendered, False, configuration=config, options=options)
-	response = make_response(pdf)
-	response.headers['Content-Type'] = 'application/pdf'
-	aux = 'inline; filename=Reporte_' + str(catedratico[1]) + "_"  + str(catedratico[2]) + '.pdf'
-	response.headers['Content-Disposition'] = aux
-	print(response)
-	return response
+
+	html = render_template('reportepdf.html', title="Monto a Facturar", catedratico=catedratico, periodosmeses = periodosmeses, meses=meses, totales = totales)
+	return render_pdf(HTML(string=html))
 
 @app.route('/historico', methods=['GET', 'POST'])
 def historico():
