@@ -1,4 +1,4 @@
-from flask import Flask, Response, render_template, request, url_for, redirect, make_response
+from flask import Flask, Response, render_template, request, url_for, redirect
 import pymysql
 import datetime
 import io
@@ -26,56 +26,57 @@ def home():
 
 @app.route('/presenciales/<idcatedratico>', methods=['GET', 'POST'])
 def presenciales(idcatedratico):
-	try:
-		conexion = pymysql.connect(host='servicioalcliente.mysql.pythonanywhere-services.com', user='servicioalclient', password='Xela77590server', db='servicioalclient$catedraticos')
-		try:
-			with conexion.cursor() as cursor:
-				consulta = "Select identradas from entradas where idcatedratico = %s and fecha = CURDATE() and completo = 0 order by horaentrada desc"
-				cursor.execute(consulta, idcatedratico)
-				banderin = cursor.fetchall()
-				if len(banderin) > 0:
-					consulta = "select p.idperiodos, c.nombre, c.horainicio, c.horafin, DATE_FORMAT(p.fecha,'%d/%m/%Y'), a.codigo, c.seccion, c.modalidad from periodos p inner join clase c on p.idclase = c.idclase inner join carrera a on a.idcarrera = c.idcarrera where c.modalidad = 1 and p.idestado = 7 and c.idcatedratico = " +str(idcatedratico) + " and CURTIME() > c.horafin and p.fecha = CURDATE() order by c.horainicio asc;"
-					estado = 1
-					print(consulta)
-					cursor.execute(consulta)
-				else:
-					consulta = "select p.idperiodos, c.nombre, c.horainicio, c.horafin, DATE_FORMAT(p.fecha,'%d/%m/%Y'), a.codigo, c.seccion, c.modalidad from periodos p inner join clase c on p.idclase = c.idclase inner join carrera a on a.idcarrera = c.idcarrera where c.modalidad = 1 and p.idestado = 1 and c.idcatedratico = " +str(idcatedratico) + " and AddTime(c.horainicio, '00:10:00') > CURTIME() and p.fecha = CURDATE() order by c.horainicio asc;"
-					estado = 0
-					print(consulta)
-					cursor.execute(consulta)
-			# Con fetchall traemos todas las filas
-				periodos = cursor.fetchall()
-				consulta = "select c.nombre, c.apellido, n.abreviatura, c.telefono, c.correo from catedratico c inner join nivelacademico n on c.idnivelacademico = n.idnivelacademico where c.idcatedratico = %s;"
-				cursor.execute(consulta, idcatedratico)
-				catedratico = cursor.fetchone()
-		finally:
-			conexion.close()
-	except (pymysql.err.OperationalError, pymysql.err.InternalError) as e:
-		print("Ocurrió un error al conectar: ", e)
-	if request.method == 'POST':
-		try:
-			conexion = pymysql.connect(host='servicioalcliente.mysql.pythonanywhere-services.com', user='servicioalclient', password='Xela77590server', db='servicioalclient$catedraticos')
-			try:
-				with conexion.cursor() as cursor:
-					if estado == 0:
-						consulta = "insert into entradas(idcatedratico, fecha, horaentrada) VALUES(%s, CURDATE(), CURTIME())"
-						cursor.execute(consulta, idcatedratico)
-						for i in periodos:
-							consulta = "Update periodos set idestado = 7 where idperiodos = %s"
-							cursor.execute(consulta, i[0])
-					elif estado == 1:
-						consulta = "update entradas set horasalida = CURTIME(), completo = 1 where idcatedratico = %s and fecha = CURDATE() and completo = 0"
-						cursor.execute(consulta, idcatedratico)
-						for i in periodos:
-							consulta = "Update periodos set idestado = 2 where idperiodos = %s"
-							cursor.execute(consulta, i[0])
-					conexion.commit()
-			finally:
-				conexion.close()
-		except (pymysql.err.OperationalError, pymysql.err.InternalError) as e:
-			print("Ocurrió un error al conectar: ", e)
-		return redirect(url_for('home'))
-	return render_template('presenciales.html', title="Registrar Periodos", periodos = periodos, catedratico = catedratico, estado = estado)
+    fechahora = datetime.datetime.now()
+    current_time = fechahora.strftime("%H:%M:%S")
+    try:
+        conexion = pymysql.connect(host='servicioalcliente.mysql.pythonanywhere-services.com', user='servicioalclient', password='Xela77590server', db='servicioalclient$catedraticos')
+        try:
+            with conexion.cursor() as cursor:
+                consulta = "Select identradas from entradas where idcatedratico = %s and fecha = CURDATE() and completo = 0 order by horaentrada desc"
+                cursor.execute(consulta, idcatedratico)
+                banderin = cursor.fetchall()
+                if len(banderin) > 0:
+                    consulta = "select p.idperiodos, c.nombre, c.horainicio, c.horafin, DATE_FORMAT(p.fecha,'%d/%m/%Y'), a.codigo, c.seccion, c.modalidad from periodos p inner join clase c on p.idclase = c.idclase inner join carrera a on a.idcarrera = c.idcarrera where c.modalidad = 1 and p.idestado = 7 and c.idcatedratico = " +str(idcatedratico) + " and '" + str(current_time) + "' > c.horafin and p.fecha = CURDATE() order by c.horainicio asc;"
+                    estado = 1
+                    print(consulta)
+                    cursor.execute(consulta)
+                else:
+                    consulta = "select p.idperiodos, c.nombre, c.horainicio, c.horafin, DATE_FORMAT(p.fecha,'%d/%m/%Y'), a.codigo, c.seccion, c.modalidad from periodos p inner join clase c on p.idclase = c.idclase inner join carrera a on a.idcarrera = c.idcarrera where c.modalidad = 1 and p.idestado = 1 and c.idcatedratico = " +str(idcatedratico) + " and AddTime(c.horainicio, '00:10:00') > '" + str(current_time) + "' and p.fecha = CURDATE() order by c.horainicio asc;"
+                    estado = 0
+                    print(consulta)
+                    cursor.execute(consulta)
+                periodos = cursor.fetchall()
+                consulta = "select c.nombre, c.apellido, n.abreviatura, c.telefono, c.correo from catedratico c inner join nivelacademico n on c.idnivelacademico = n.idnivelacademico where c.idcatedratico = %s;"
+                cursor.execute(consulta, idcatedratico)
+                catedratico = cursor.fetchone()
+        finally:
+            conexion.close()
+    except (pymysql.err.OperationalError, pymysql.err.InternalError) as e:
+        print("Ocurrió un error al conectar: ", e)
+    if request.method == 'POST':
+        try:
+            conexion = pymysql.connect(host='servicioalcliente.mysql.pythonanywhere-services.com', user='servicioalclient', password='Xela77590server', db='servicioalclient$catedraticos')
+            try:
+                with conexion.cursor() as cursor:
+                    if estado == 0:
+                        consulta = "insert into entradas(idcatedratico, fecha, horaentrada) VALUES(%s, CURDATE(), CURTIME())"
+                        cursor.execute(consulta, idcatedratico)
+                        for i in periodos:
+                            consulta = "Update periodos set idestado = 7 where idperiodos = %s"
+                            cursor.execute(consulta, i[0])
+                    elif estado == 1:
+                        consulta = "update entradas set horasalida = CURTIME(), completo = 1 where idcatedratico = %s and fecha = CURDATE() and completo = 0"
+                        cursor.execute(consulta, idcatedratico)
+                        for i in periodos:
+                            consulta = "Update periodos set idestado = 2 where idperiodos = %s"
+                            cursor.execute(consulta, i[0])
+                    conexion.commit()
+            finally:
+                conexion.close()
+        except (pymysql.err.OperationalError, pymysql.err.InternalError) as e:
+            print("Ocurrió un error al conectar: ", e)
+        return redirect(url_for('home'))
+    return render_template('presenciales.html', title="Registrar Periodos", periodos = periodos, catedratico = catedratico, estado = estado, current_time = current_time)
 
 @app.route('/catedraticos')
 def catedraticos():
