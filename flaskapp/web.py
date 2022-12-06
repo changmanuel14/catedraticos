@@ -608,6 +608,8 @@ def montofacturarpdf():
 						totalmes = 0
 					try:
 						total = float(total[0])
+						if totalmes > total:
+							total = totalmes
 						diferencia = total - totalmes
 					except:
 						total = totalmes
@@ -652,6 +654,8 @@ def montofacturarexcel():
 						totalmes = 0
 					try:
 						total = float(total[0])
+						if totalmes > total:
+							total = totalmes
 						diferencia = total - totalmes
 					except:
 						total = totalmes
