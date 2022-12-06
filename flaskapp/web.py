@@ -1,11 +1,15 @@
-from flask import Flask, Response, render_template, request, url_for, redirect
+from flask import Flask, Response, render_template, request, url_for, redirect, make_response, session
 import pymysql
 import datetime
+import os
+import webbrowser
 import io
 import xlwt
+import pdfkit as pdfkit
 import barcode
 from barcode.writer import ImageWriter
 from flask_weasyprint import HTML, render_pdf
+from conexion import Conhost, Conuser, Conpassword, Condb
 
 app = Flask(__name__)
 app.secret_key = 'd589d3d0d15d764ed0a98ff5a37af547'
@@ -26,62 +30,61 @@ def home():
 
 @app.route('/presenciales/<idcatedratico>', methods=['GET', 'POST'])
 def presenciales(idcatedratico):
-    fechahora = datetime.datetime.now()
-    current_time = fechahora.strftime("%H:%M:%S")
-    try:
-        conexion = pymysql.connect(host='servicioalcliente.mysql.pythonanywhere-services.com', user='servicioalclient', password='Xela77590server', db='servicioalclient$catedraticos')
-        try:
-            with conexion.cursor() as cursor:
-                consulta = "Select identradas from entradas where idcatedratico = %s and fecha = CURDATE() and completo = 0 order by horaentrada desc"
-                cursor.execute(consulta, idcatedratico)
-                banderin = cursor.fetchall()
-                if len(banderin) > 0:
-                    consulta = "select p.idperiodos, c.nombre, c.horainicio, c.horafin, DATE_FORMAT(p.fecha,'%d/%m/%Y'), a.codigo, c.seccion, c.modalidad from periodos p inner join clase c on p.idclase = c.idclase inner join carrera a on a.idcarrera = c.idcarrera where c.modalidad = 1 and p.idestado = 7 and c.idcatedratico = " +str(idcatedratico) + " and '" + str(current_time) + "' > c.horafin and p.fecha = CURDATE() order by c.horainicio asc;"
-                    estado = 1
-                    print(consulta)
-                    cursor.execute(consulta)
-                else:
-                    consulta = "select p.idperiodos, c.nombre, c.horainicio, c.horafin, DATE_FORMAT(p.fecha,'%d/%m/%Y'), a.codigo, c.seccion, c.modalidad from periodos p inner join clase c on p.idclase = c.idclase inner join carrera a on a.idcarrera = c.idcarrera where c.modalidad = 1 and p.idestado = 1 and c.idcatedratico = " +str(idcatedratico) + " and AddTime(c.horainicio, '00:10:00') > '" + str(current_time) + "' and p.fecha = CURDATE() order by c.horainicio asc;"
-                    estado = 0
-                    print(consulta)
-                    cursor.execute(consulta)
-                periodos = cursor.fetchall()
-                consulta = "select c.nombre, c.apellido, n.abreviatura, c.telefono, c.correo from catedratico c inner join nivelacademico n on c.idnivelacademico = n.idnivelacademico where c.idcatedratico = %s;"
-                cursor.execute(consulta, idcatedratico)
-                catedratico = cursor.fetchone()
-        finally:
-            conexion.close()
-    except (pymysql.err.OperationalError, pymysql.err.InternalError) as e:
-        print("Ocurrió un error al conectar: ", e)
-    if request.method == 'POST':
-        try:
-            conexion = pymysql.connect(host='servicioalcliente.mysql.pythonanywhere-services.com', user='servicioalclient', password='Xela77590server', db='servicioalclient$catedraticos')
-            try:
-                with conexion.cursor() as cursor:
-                    if estado == 0:
-                        consulta = "insert into entradas(idcatedratico, fecha, horaentrada) VALUES(%s, CURDATE(), CURTIME())"
-                        cursor.execute(consulta, idcatedratico)
-                        for i in periodos:
-                            consulta = "Update periodos set idestado = 7 where idperiodos = %s"
-                            cursor.execute(consulta, i[0])
-                    elif estado == 1:
-                        consulta = "update entradas set horasalida = CURTIME(), completo = 1 where idcatedratico = %s and fecha = CURDATE() and completo = 0"
-                        cursor.execute(consulta, idcatedratico)
-                        for i in periodos:
-                            consulta = "Update periodos set idestado = 2 where idperiodos = %s"
-                            cursor.execute(consulta, i[0])
-                    conexion.commit()
-            finally:
-                conexion.close()
-        except (pymysql.err.OperationalError, pymysql.err.InternalError) as e:
-            print("Ocurrió un error al conectar: ", e)
-        return redirect(url_for('home'))
-    return render_template('presenciales.html', title="Registrar Periodos", periodos = periodos, catedratico = catedratico, estado = estado, current_time = current_time)
+	try:
+		conexion = pymysql.connect(host=Conhost, user=Conuser, password=Conpassword, db=Condb)
+		try:
+			with conexion.cursor() as cursor:
+				consulta = "Select identradas from entradas where idcatedratico = %s and fecha = CURDATE() and completo = 0 order by horaentrada desc"
+				cursor.execute(consulta, idcatedratico)
+				banderin = cursor.fetchall()
+				if len(banderin) > 0:
+					consulta = "select p.idperiodos, c.nombre, c.horainicio, c.horafin, DATE_FORMAT(p.fecha,'%d/%m/%Y'), a.codigo, c.seccion, c.modalidad from periodos p inner join clase c on p.idclase = c.idclase inner join carrera a on a.idcarrera = c.idcarrera where c.modalidad = 1 and p.idestado = 7 and c.idcatedratico = " +str(idcatedratico) + " and AddTime(CURTIME(), '00:15:00') > c.horafin and p.fecha = CURDATE() order by c.horainicio asc;"
+					estado = 1
+					print(consulta)
+					cursor.execute(consulta)
+				else:
+					consulta = "select p.idperiodos, c.nombre, c.horainicio, c.horafin, DATE_FORMAT(p.fecha,'%d/%m/%Y'), a.codigo, c.seccion, c.modalidad from periodos p inner join clase c on p.idclase = c.idclase inner join carrera a on a.idcarrera = c.idcarrera where c.modalidad = 1 and p.idestado = 1 and c.idcatedratico = " +str(idcatedratico) + " and AddTime(c.horainicio, '00:15:00') > CURTIME() and p.fecha = CURDATE() order by c.horainicio asc;"
+					estado = 0
+					print(consulta)
+					cursor.execute(consulta)
+			# Con fetchall traemos todas las filas
+				periodos = cursor.fetchall()
+				consulta = "select c.nombre, c.apellido, n.abreviatura, c.telefono, c.correo from catedratico c inner join nivelacademico n on c.idnivelacademico = n.idnivelacademico where c.idcatedratico = %s;"
+				cursor.execute(consulta, idcatedratico)
+				catedratico = cursor.fetchone()
+		finally:
+			conexion.close()
+	except (pymysql.err.OperationalError, pymysql.err.InternalError) as e:
+		print("Ocurrió un error al conectar: ", e)
+	if request.method == 'POST':
+		try:
+			conexion = pymysql.connect(host=Conhost, user=Conuser, password=Conpassword, db=Condb)
+			try:
+				with conexion.cursor() as cursor:
+					if estado == 0:
+						consulta = "insert into entradas(idcatedratico, fecha, horaentrada) VALUES(%s, CURDATE(), CURTIME())"
+						cursor.execute(consulta, idcatedratico)
+						for i in periodos:
+							consulta = "Update periodos set idestado = 7 where idperiodos = %s"
+							cursor.execute(consulta, i[0])
+					elif estado == 1:
+						consulta = "update entradas set horasalida = CURTIME(), completo = 1 where idcatedratico = %s and fecha = CURDATE() and completo = 0"
+						cursor.execute(consulta, idcatedratico)
+						for i in periodos:
+							consulta = "Update periodos set idestado = 2 where idperiodos = %s"
+							cursor.execute(consulta, i[0])
+					conexion.commit()
+			finally:
+				conexion.close()
+		except (pymysql.err.OperationalError, pymysql.err.InternalError) as e:
+			print("Ocurrió un error al conectar: ", e)
+		return redirect(url_for('home'))
+	return render_template('presenciales.html', title="Registrar Periodos", periodos = periodos, catedratico = catedratico, estado = estado)
 
 @app.route('/catedraticos')
 def catedraticos():
 	try:
-		conexion = pymysql.connect(host='servicioalcliente.mysql.pythonanywhere-services.com', user='servicioalclient', password='Xela77590server', db='servicioalclient$catedraticos')
+		conexion = pymysql.connect(host=Conhost, user=Conuser, password=Conpassword, db=Condb)
 		try:
 			with conexion.cursor() as cursor:
 				cursor.execute("SELECT c.nombre, c.apellido, n.abreviatura, c.idcatedratico from catedratico c inner join nivelacademico n on c.idnivelacademico = n.idnivelacademico order by n.abreviatura, c.nombre;")
@@ -96,7 +99,7 @@ def catedraticos():
 @app.route('/nuevocatedratico', methods=['GET', 'POST'])
 def nuevocatedratico():
 	try:
-		conexion = pymysql.connect(host='servicioalcliente.mysql.pythonanywhere-services.com', user='servicioalclient', password='Xela77590server', db='servicioalclient$catedraticos')
+		conexion = pymysql.connect(host=Conhost, user=Conuser, password=Conpassword, db=Condb)
 		try:
 			with conexion.cursor() as cursor:
 				cursor.execute("SELECT idnivelacademico, nombre from nivelacademico order by nombre;")
@@ -106,7 +109,7 @@ def nuevocatedratico():
 			conexion.close()
 	except (pymysql.err.OperationalError, pymysql.err.InternalError) as e:
 		print("Ocurrió un error al conectar: ", e)
-
+	
 	if request.method == 'POST':
 		nombre = request.form["nombre"]
 		apellido = request.form["apellido"]
@@ -115,7 +118,7 @@ def nuevocatedratico():
 		correo = request.form["correo"]
 		correo = correo.lower()
 		try:
-			conexion = pymysql.connect(host='servicioalcliente.mysql.pythonanywhere-services.com', user='servicioalclient', password='Xela77590server', db='servicioalclient$catedraticos')
+			conexion = pymysql.connect(host=Conhost, user=Conuser, password=Conpassword, db=Condb)
 			try:
 				with conexion.cursor() as cursor:
 					consulta = "INSERT INTO catedratico(nombre,apellido,idnivelacademico, telefono, correo) VALUES (%s,%s,%s,%s,%s);"
@@ -131,7 +134,7 @@ def nuevocatedratico():
 @app.route('/editarcatedratico/<id>', methods=['GET', 'POST'])
 def editarcatedratico(id):
 	try:
-		conexion = pymysql.connect(host='servicioalcliente.mysql.pythonanywhere-services.com', user='servicioalclient', password='Xela77590server', db='servicioalclient$catedraticos')
+		conexion = pymysql.connect(host=Conhost, user=Conuser, password=Conpassword, db=Condb)
 		try:
 			with conexion.cursor() as cursor:
 				cursor.execute("SELECT idnivelacademico, nombre from nivelacademico order by nombre;")
@@ -152,12 +155,12 @@ def editarcatedratico(id):
 
 	#Generate barcode and render as image
 	my_barcode = barcode_format(number, writer=ImageWriter())
-
+	
 	#Save barcode as PNG
-	aux = "static/barcodes/" + catedratico[0] + '_' + catedratico[1]
+	aux = "flaskapp\\static\\barcodes\\" + catedratico[0] + '_' + catedratico[1]
 	my_barcode.save(aux)
 
-
+	
 	if request.method == 'POST':
 		nombre = request.form["nombre"]
 		apellido = request.form["apellido"]
@@ -166,7 +169,7 @@ def editarcatedratico(id):
 		correo = request.form["correo"]
 		correo = correo.lower()
 		try:
-			conexion = pymysql.connect(host='servicioalcliente.mysql.pythonanywhere-services.com', user='servicioalclient', password='Xela77590server', db='servicioalclient$catedraticos')
+			conexion = pymysql.connect(host=Conhost, user=Conuser, password=Conpassword, db=Condb)
 			try:
 				with conexion.cursor() as cursor:
 					consulta = "UPDATE catedratico SET nombre = %s, apellido = %s, idnivelacademico = %s, telefono = %s, correo = %s WHERE idcatedratico = %s;"
@@ -182,7 +185,7 @@ def editarcatedratico(id):
 @app.route('/eliminarcatedratico/<id>', methods=['GET', 'POST'])
 def eliminarcatedratico(id):
 	try:
-		conexion = pymysql.connect(host='servicioalcliente.mysql.pythonanywhere-services.com', user='servicioalclient', password='Xela77590server', db='servicioalclient$catedraticos')
+		conexion = pymysql.connect(host=Conhost, user=Conuser, password=Conpassword, db=Condb)
 		try:
 			with conexion.cursor() as cursor:
 				consulta = "DELETE from catedratico WHERE idcatedratico = " + str(id)
@@ -192,7 +195,7 @@ def eliminarcatedratico(id):
 			conexion.close()
 	except (pymysql.err.OperationalError, pymysql.err.InternalError) as e:
 		print("Ocurrió un error al conectar: ", e)
-
+	
 	return redirect(url_for('catedraticos'))
 
 @app.route('/periodos')
@@ -203,7 +206,7 @@ def periodos():
 def nuevaclase():
 	dias = [[0, "Lunes"], [1, "Martes"], [2, "Miercoles"], [3, "Jueves"], [4, "Viernes"], [5, "Sabado"], [6, "Domingo"]]
 	try:
-		conexion = pymysql.connect(host='servicioalcliente.mysql.pythonanywhere-services.com', user='servicioalclient', password='Xela77590server', db='servicioalclient$catedraticos')
+		conexion = pymysql.connect(host=Conhost, user=Conuser, password=Conpassword, db=Condb)
 		try:
 			with conexion.cursor() as cursor:
 				cursor.execute("SELECT idcarrera, nombre, codigo from carrera order by codigo;")
@@ -216,7 +219,7 @@ def nuevaclase():
 			conexion.close()
 	except (pymysql.err.OperationalError, pymysql.err.InternalError) as e:
 		print("Ocurrió un error al conectar: ", e)
-
+	
 	if request.method == 'POST':
 		curso = request.form["curso"]
 		carrera = request.form["carrera"]
@@ -231,7 +234,7 @@ def nuevaclase():
 		modalidad = request.form["modalidad"]
 		formadepago = request.form["formadepago"]
 		try:
-			conexion = pymysql.connect(host='servicioalcliente.mysql.pythonanywhere-services.com', user='servicioalclient', password='Xela77590server', db='servicioalclient$catedraticos')
+			conexion = pymysql.connect(host=Conhost, user=Conuser, password=Conpassword, db=Condb)
 			try:
 				with conexion.cursor() as cursor:
 					consulta = "INSERT INTO clase(nombre,fechainicio,fechafin, seccion, idcarrera, horainicio, horafin, precio, idcatedratico, dia, modalidad, formadepago) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);"
@@ -256,7 +259,7 @@ def nuevaclase():
 							consulta = "INSERT INTO periodos(idclase,fecha,idestado, liquidado, precio, formadepago) VALUES (%s,%s,%s,%s,%s,%s);"
 							cursor.execute(consulta, (idclase, aux, 1, 0, precio, formadepago))
 							aux = aux + datetime.timedelta(days=7)
-						conexion.commit()
+						conexion.commit() 
 
 
 			finally:
@@ -270,7 +273,7 @@ def nuevaclase():
 def editarclase(id):
 	dias = [[0, "Lunes"], [1, "Martes"], [2, "Miercoles"], [3, "Jueves"], [4, "Viernes"], [5, "Sabado"], [6, "Domingo"]]
 	try:
-		conexion = pymysql.connect(host='servicioalcliente.mysql.pythonanywhere-services.com', user='servicioalclient', password='Xela77590server', db='servicioalclient$catedraticos')
+		conexion = pymysql.connect(host=Conhost, user=Conuser, password=Conpassword, db=Condb)
 		try:
 			with conexion.cursor() as cursor:
 				cursor.execute("SELECT idcarrera, nombre, codigo from carrera order by codigo;")
@@ -289,7 +292,7 @@ def editarclase(id):
 			conexion.close()
 	except (pymysql.err.OperationalError, pymysql.err.InternalError) as e:
 		print("Ocurrió un error al conectar: ", e)
-
+	
 	if request.method == 'POST':
 		curso = request.form["curso"]
 		seccion = request.form["seccion"]
@@ -303,7 +306,7 @@ def editarclase(id):
 		fechafin = request.form["fechafin"]
 		dia = request.form["dia"]
 		try:
-			conexion = pymysql.connect(host='servicioalcliente.mysql.pythonanywhere-services.com', user='servicioalclient', password='Xela77590server', db='servicioalclient$catedraticos')
+			conexion = pymysql.connect(host=Conhost, user=Conuser, password=Conpassword, db=Condb)
 			try:
 				with conexion.cursor() as cursor:
 					consulta = "UPDATE clase set nombre = %s, seccion = %s, idcarrera = %s, horainicio = %s, horafin = %s, precio = %s, modalidad = %s, formadepago = %s, fechainicio = %s, fechafin = %s, dia = %s where idclase = %s;"
@@ -343,7 +346,7 @@ def editarclase(id):
 @app.route('/periodoscatedratico', methods=['GET', 'POST'])
 def periodoscatedratico():
 	try:
-		conexion = pymysql.connect(host='servicioalcliente.mysql.pythonanywhere-services.com', user='servicioalclient', password='Xela77590server', db='servicioalclient$catedraticos')
+		conexion = pymysql.connect(host=Conhost, user=Conuser, password=Conpassword, db=Condb)
 		try:
 			with conexion.cursor() as cursor:
 				cursor.execute("SELECT c.idcatedratico, c.nombre, c.apellido, n.abreviatura from catedratico c inner join nivelacademico n on c.idnivelacademico = n.idnivelacademico inner join clase l on l.idcatedratico = c.idcatedratico where l.fechafin >= CURDATE() group by c.idcatedratico, c.nombre, c.apellido, n.abreviatura order by n.abreviatura, c.nombre;")
@@ -359,7 +362,7 @@ def periodoscatedratico():
 def periodoscat(id):
 	dias = [[0, "Lunes"], [1, "Martes"], [2, "Miercoles"], [3, "Jueves"], [4, "Viernes"], [5, "Sabado"], [6, "Domingo"]]
 	try:
-		conexion = pymysql.connect(host='servicioalcliente.mysql.pythonanywhere-services.com', user='servicioalclient', password='Xela77590server', db='servicioalclient$catedraticos')
+		conexion = pymysql.connect(host=Conhost, user=Conuser, password=Conpassword, db=Condb)
 		try:
 			with conexion.cursor() as cursor:
 				consulta = "SELECT c.idcatedratico, c.nombre, c.apellido, c.correo, c.telefono, n.abreviatura from catedratico c inner join nivelacademico n on c.idnivelacademico = n.idnivelacademico where c.idcatedratico = %s"
@@ -390,9 +393,9 @@ def periodoscat(id):
 
 	#Generate barcode and render as image
 	my_barcode = barcode_format(number, writer=ImageWriter())
-
+	
 	#Save barcode as PNG
-	aux = "static/barcodes/" + catedratico[1] + '_' + catedratico[2]
+	aux = "flaskapp\\static\\barcodes\\" + catedratico[1] + '_' + catedratico[2]
 	my_barcode.save(aux)
 	return render_template('periodoscat.html', title="Periodos por Catedrático", catedratico=catedratico, clases = clases, clasesdias = clasesdias, dias=dias)
 
@@ -400,7 +403,7 @@ def periodoscat(id):
 def periodoscatpdf(id):
 	dias = [[0, "Lunes"], [1, "Martes"], [2, "Miercoles"], [3, "Jueves"], [4, "Viernes"], [5, "Sabado"], [6, "Domingo"]]
 	try:
-		conexion = pymysql.connect(host='servicioalcliente.mysql.pythonanywhere-services.com', user='servicioalclient', password='Xela77590server', db='servicioalclient$catedraticos')
+		conexion = pymysql.connect(host=Conhost, user=Conuser, password=Conpassword, db=Condb)
 		try:
 			with conexion.cursor() as cursor:
 				consulta = "SELECT c.idcatedratico, c.nombre, c.apellido, c.correo, c.telefono, n.abreviatura from catedratico c inner join nivelacademico n on c.idnivelacademico = n.idnivelacademico where c.idcatedratico = %s"
@@ -423,7 +426,6 @@ def periodoscatpdf(id):
 			conexion.close()
 	except (pymysql.err.OperationalError, pymysql.err.InternalError) as e:
 		print("Ocurrió un error al conectar: ", e)
-
 	html = render_template('periodoscatpdf.html', title="Horario Catedratico", catedratico=catedratico, clases = clases, clasesdias = clasesdias, dias=dias)
 	return render_pdf(HTML(string=html))
 
@@ -433,7 +435,7 @@ def nuevacarrera():
 		nombre = request.form["nombre"]
 		codigo = request.form["codigo"]
 		try:
-			conexion = pymysql.connect(host='servicioalcliente.mysql.pythonanywhere-services.com', user='servicioalclient', password='Xela77590server', db='servicioalclient$catedraticos')
+			conexion = pymysql.connect(host=Conhost, user=Conuser, password=Conpassword, db=Condb)
 			try:
 				with conexion.cursor() as cursor:
 					consulta = "INSERT INTO carrera(nombre,codigo) VALUES (%s,%s);"
@@ -449,7 +451,7 @@ def nuevacarrera():
 @app.route('/registroperiodos', methods=['GET', 'POST'])
 def registroperiodos():
 	try:
-		conexion = pymysql.connect(host='servicioalcliente.mysql.pythonanywhere-services.com', user='servicioalclient', password='Xela77590server', db='servicioalclient$catedraticos')
+		conexion = pymysql.connect(host=Conhost, user=Conuser, password=Conpassword, db=Condb)
 		try:
 			with conexion.cursor() as cursor:
 				cursor.execute("SELECT c.idcatedratico, c.nombre, c.apellido, n.abreviatura from catedratico c inner join nivelacademico n on c.idnivelacademico = n.idnivelacademico inner join clase l on l.idcatedratico = c.idcatedratico inner join periodos p on l.idclase = p.idclase where p.fecha <= CURDATE() and p.idestado = 1 group by c.idcatedratico, c.nombre, c.apellido, n.abreviatura order by n.abreviatura, c.nombre;")
@@ -465,7 +467,7 @@ def registroperiodos():
 def registroper(id):
 	meses = [[1, "Enero"], [2, "Febrero"], [3, "Marzo"], [4, "Abril"], [5, "Mayo"], [6, "Junio"], [7, "Julio"], [8, "Agosto"], [9, "Septiembre"], [10, "Octubre"], [11, "Noviembre"], [12, "Diciembre"]]
 	try:
-		conexion = pymysql.connect(host='servicioalcliente.mysql.pythonanywhere-services.com', user='servicioalclient', password='Xela77590server', db='servicioalclient$catedraticos')
+		conexion = pymysql.connect(host=Conhost, user=Conuser, password=Conpassword, db=Condb)
 		try:
 			with conexion.cursor() as cursor:
 				consulta = "SELECT c.idcatedratico, c.nombre, c.apellido, c.correo, c.telefono, n.abreviatura from catedratico c inner join nivelacademico n on c.idnivelacademico = n.idnivelacademico where c.idcatedratico = %s"
@@ -504,13 +506,13 @@ def registroper(id):
 
 	#Generate barcode and render as image
 	my_barcode = barcode_format(number, writer=ImageWriter())
-
+	
 	#Save barcode as PNG
-	aux = "static/barcodes/" + catedratico[1] + '_' + catedratico[2]
+	aux = "flaskapp\\static\\barcodes\\" + catedratico[1] + '_' + catedratico[2]
 	my_barcode.save(aux)
 	if request.method == 'POST':
 		try:
-			conexion = pymysql.connect(host='servicioalcliente.mysql.pythonanywhere-services.com', user='servicioalclient', password='Xela77590server', db='servicioalclient$catedraticos')
+			conexion = pymysql.connect(host=Conhost, user=Conuser, password=Conpassword, db=Condb)
 			try:
 				with conexion.cursor() as cursor:
 					consulta = "SELECT p.idperiodos from periodos p inner join clase c on c.idclase = p.idclase where p.idestado = 1 and p.fecha <= CURDATE() and c.idcatedratico = " + str(id)
@@ -522,7 +524,7 @@ def registroper(id):
 						estado = request.form[aux]
 						consulta = "UPDATE periodos set idestado = " + str(estado) + ", fecharegistro = CURDATE() where idperiodos = " +str(i[0])
 						cursor.execute(consulta)
-				conexion.commit()
+				conexion.commit() 
 			finally:
 				conexion.close()
 		except (pymysql.err.OperationalError, pymysql.err.InternalError) as e:
@@ -533,29 +535,36 @@ def registroper(id):
 @app.route('/montofacturar', methods=['GET', 'POST'])
 def montofacturar():
 	try:
-		conexion = pymysql.connect(host='servicioalcliente.mysql.pythonanywhere-services.com', user='servicioalclient', password='Xela77590server', db='servicioalclient$catedraticos')
+		conexion = pymysql.connect(host=Conhost, user=Conuser, password=Conpassword, db=Condb)
 		try:
 			with conexion.cursor() as cursor:
-				cursor.execute("SELECT c.idcatedratico, c.nombre, c.apellido, n.abreviatura, p.formadepago from catedratico c inner join nivelacademico n on c.idnivelacademico = n.idnivelacademico inner join clase l on l.idcatedratico = c.idcatedratico inner join periodos p on l.idclase = p.idclase where p.fecha <= CURDATE() and p.idestado = 2 and p.liquidado = 0 group by c.idcatedratico, c.nombre, c.apellido, n.abreviatura, p.formadepago order by n.abreviatura, c.nombre;")
+				today = datetime.datetime.today()
+				mes = int(today.month)
+				if mes == 1:
+					mesant = 12
+				else:
+					mesant = mes - 1
+				consulta = "SELECT c.idcatedratico, c.nombre, c.apellido, n.abreviatura, p.formadepago from catedratico c inner join nivelacademico n on c.idnivelacademico = n.idnivelacademico inner join clase l on l.idcatedratico = c.idcatedratico inner join periodos p on l.idclase = p.idclase where month(p.fecha) < %s and ((month(p.fecharegistro) = %s and day(p.fecharegistro) < 5) or (month(p.fecharegistro) = %s and day(p.fecharegistro) >= 5)) and p.idestado = 2 and p.liquidado = 0 group by c.idcatedratico, c.nombre, c.apellido, n.abreviatura, p.formadepago order by n.abreviatura, c.nombre;"
+				cursor.execute(consulta, (mes, mes, mesant))
 			# Con fetchall traemos todas las filas
 				catedraticos = cursor.fetchall()
 				cantidad = len(catedraticos)
 				data = []
 				for i in catedraticos:
-					today = datetime.datetime.today()
-					mes = int(today.month) - 1
-					consulta = "SELECT sum(p.precio) from periodos p inner join clase c on c.idclase = p.idclase where c.idcatedratico = %s and p.idestado = 2 and p.liquidado = 0 and p.formadepago = %s"
-					cursor.execute(consulta, (i[0], i[4]))
+					consulta = "SELECT sum(p.precio) from periodos p inner join clase c on c.idclase = p.idclase where c.idcatedratico = %s and p.idestado = 2 and p.liquidado = 0 and p.formadepago = %s and ((month(p.fecharegistro) < %s) or (month(p.fecharegistro) = %s and day(p.fecharegistro < 5)))"
+					cursor.execute(consulta, (i[0], i[4], mes, mes))
 					total = cursor.fetchone()
-					consulta = "SELECT sum(p.precio) from periodos p inner join clase c on c.idclase = p.idclase where c.idcatedratico = %s and p.formadepago = %s and ((month(p.fecharegistro) = %s and day(p.fecharegistro) >= 5) or (month(p.fecharegistro) = %s and day(p.fecharegistro) < 5)) and p.idestado = 2 and p.liquidado = 0"
-					cursor.execute(consulta, (i[0],i[4], mes, mes+1))
+					consulta = "SELECT sum(p.precio) from periodos p inner join clase c on c.idclase = p.idclase where c.idcatedratico = %s and p.formadepago = %s and p.idestado = 2 and p.liquidado = 0 and month(p.fecha) < %s and ((month(p.fecharegistro) = %s and day(p.fecharegistro) < 5) or (month(p.fecharegistro) = %s and day(p.fecharegistro) >= 5))"
+					cursor.execute(consulta, (i[0],i[4], mes, mes, mesant))
 					totalmes = cursor.fetchone()
 					try:
-						totalmes = float(totalmes[0])
+						totalmes = float(totalmes[0]) 
 					except:
 						totalmes = 0
 					try:
 						total = float(total[0])
+						if totalmes > total:
+							total = totalmes
 						diferencia = total - totalmes
 					except:
 						total = totalmes
@@ -571,26 +580,30 @@ def montofacturar():
 @app.route('/montofacturarpdf', methods=['GET', 'POST'])
 def montofacturarpdf():
 	try:
-		conexion = pymysql.connect(host='servicioalcliente.mysql.pythonanywhere-services.com', user='servicioalclient', password='Xela77590server', db='servicioalclient$catedraticos')
+		conexion = pymysql.connect(host=Conhost, user=Conuser, password=Conpassword, db=Condb)
 		try:
 			with conexion.cursor() as cursor:
-				cursor.execute("SELECT c.idcatedratico, c.nombre, c.apellido, n.abreviatura, p.formadepago from catedratico c inner join nivelacademico n on c.idnivelacademico = n.idnivelacademico inner join clase l on l.idcatedratico = c.idcatedratico inner join periodos p on l.idclase = p.idclase where p.fecha <= CURDATE() and p.idestado = 2 and p.liquidado = 0 group by c.idcatedratico, c.nombre, c.apellido, n.abreviatura, p.formadepago order by n.abreviatura, c.nombre;")
+				today = datetime.datetime.today()
+				mes = int(today.month)
+				if mes == 1:
+					mesant = 12
+				else:
+					mesant = mes - 1
+				consulta = "SELECT c.idcatedratico, c.nombre, c.apellido, n.abreviatura, p.formadepago from catedratico c inner join nivelacademico n on c.idnivelacademico = n.idnivelacademico inner join clase l on l.idcatedratico = c.idcatedratico inner join periodos p on l.idclase = p.idclase where month(p.fecha) < %s and ((month(p.fecharegistro) = %s and day(p.fecharegistro) < 5) or (month(p.fecharegistro) = %s and day(p.fecharegistro) >= 5)) and p.idestado = 2 and p.liquidado = 0 group by c.idcatedratico, c.nombre, c.apellido, n.abreviatura, p.formadepago order by n.abreviatura, c.nombre;"
+				cursor.execute(consulta, (mes, mes, mesant))
 			# Con fetchall traemos todas las filas
 				catedraticos = cursor.fetchall()
 				cantidad = len(catedraticos)
 				data = []
 				for i in catedraticos:
-					print("Id ",i[0])
-					today = datetime.datetime.today()
-					mes = int(today.month) - 1
-					consulta = "SELECT sum(p.precio) from periodos p inner join clase c on c.idclase = p.idclase where c.idcatedratico = %s and p.idestado = 2 and p.liquidado = 0 and p.formadepago = %s"
-					cursor.execute(consulta, (i[0], i[4]))
+					consulta = "SELECT sum(p.precio) from periodos p inner join clase c on c.idclase = p.idclase where c.idcatedratico = %s and p.idestado = 2 and p.liquidado = 0 and p.formadepago = %s and ((month(p.fecharegistro) < %s) or (month(p.fecharegistro) = %s and day(p.fecharegistro < 5)))"
+					cursor.execute(consulta, (i[0], i[4], mes, mes))
 					total = cursor.fetchone()
-					consulta = "SELECT sum(p.precio) from periodos p inner join clase c on c.idclase = p.idclase where c.idcatedratico = %s and p.formadepago = %s and ((month(p.fecharegistro) = %s and day(p.fecharegistro) >= 5) or (month(p.fecharegistro) = %s and day(p.fecharegistro) < 5)) and p.idestado = 2 and p.liquidado = 0"
-					cursor.execute(consulta, (i[0],i[4], mes, mes+1))
+					consulta = "SELECT sum(p.precio) from periodos p inner join clase c on c.idclase = p.idclase where c.idcatedratico = %s and p.formadepago = %s and p.idestado = 2 and p.liquidado = 0 and month(p.fecha) < %s and ((month(p.fecharegistro) = %s and day(p.fecharegistro) < 5) or (month(p.fecharegistro) = %s and day(p.fecharegistro) >= 5))"
+					cursor.execute(consulta, (i[0],i[4], mes, mes, mesant))
 					totalmes = cursor.fetchone()
 					try:
-						totalmes = float(totalmes[0])
+						totalmes = float(totalmes[0]) 
 					except:
 						totalmes = 0
 					try:
@@ -611,25 +624,30 @@ def montofacturarpdf():
 @app.route('/montofacturarexcel', methods=['GET', 'POST'])
 def montofacturarexcel():
 	try:
-		conexion = pymysql.connect(host='servicioalcliente.mysql.pythonanywhere-services.com', user='servicioalclient', password='Xela77590server', db='servicioalclient$catedraticos')
+		conexion = pymysql.connect(host=Conhost, user=Conuser, password=Conpassword, db=Condb)
 		try:
 			with conexion.cursor() as cursor:
-				cursor.execute("SELECT c.idcatedratico, c.nombre, c.apellido, n.abreviatura, p.formadepago from catedratico c inner join nivelacademico n on c.idnivelacademico = n.idnivelacademico inner join clase l on l.idcatedratico = c.idcatedratico inner join periodos p on l.idclase = p.idclase where p.fecha <= CURDATE() and p.idestado = 2 and p.liquidado = 0 group by c.idcatedratico, c.nombre, c.apellido, n.abreviatura, p.formadepago order by n.abreviatura, c.nombre;")
+				today = datetime.datetime.today()
+				mes = int(today.month)
+				if mes == 1:
+					mesant = 12
+				else:
+					mesant = mes - 1
+				consulta = "SELECT c.idcatedratico, c.nombre, c.apellido, n.abreviatura, p.formadepago from catedratico c inner join nivelacademico n on c.idnivelacademico = n.idnivelacademico inner join clase l on l.idcatedratico = c.idcatedratico inner join periodos p on l.idclase = p.idclase where month(p.fecha) < %s and ((month(p.fecharegistro) = %s and day(p.fecharegistro) < 5) or (month(p.fecharegistro) = %s and day(p.fecharegistro) >= 5)) and p.idestado = 2 and p.liquidado = 0 group by c.idcatedratico, c.nombre, c.apellido, n.abreviatura, p.formadepago order by n.abreviatura, c.nombre;"
+				cursor.execute(consulta, (mes, mes, mesant))
 			# Con fetchall traemos todas las filas
 				catedraticos = cursor.fetchall()
 				cantidad = len(catedraticos)
 				data = []
 				for i in catedraticos:
-					today = datetime.datetime.today()
-					mes = int(today.month) - 1
-					consulta = "SELECT sum(p.precio) from periodos p inner join clase c on c.idclase = p.idclase where c.idcatedratico = %s and p.idestado = 2 and p.liquidado = 0 and p.formadepago = %s"
-					cursor.execute(consulta, (i[0], i[4]))
+					consulta = "SELECT sum(p.precio) from periodos p inner join clase c on c.idclase = p.idclase where c.idcatedratico = %s and p.idestado = 2 and p.liquidado = 0 and p.formadepago = %s and ((month(p.fecharegistro) < %s) or (month(p.fecharegistro) = %s and day(p.fecharegistro < 5)))"
+					cursor.execute(consulta, (i[0], i[4], mes, mes))
 					total = cursor.fetchone()
-					consulta = "SELECT sum(p.precio) from periodos p inner join clase c on c.idclase = p.idclase where c.idcatedratico = %s and p.formadepago = %s and ((month(p.fecharegistro) = %s and day(p.fecharegistro) >= 5) or (month(p.fecharegistro) = %s and day(p.fecharegistro) < 5)) and p.idestado = 2 and p.liquidado = 0"
-					cursor.execute(consulta, (i[0],i[4], mes, mes+1))
+					consulta = "SELECT sum(p.precio) from periodos p inner join clase c on c.idclase = p.idclase where c.idcatedratico = %s and p.formadepago = %s and p.idestado = 2 and p.liquidado = 0 and month(p.fecha) < %s and ((month(p.fecharegistro) = %s and day(p.fecharegistro) < 5) or (month(p.fecharegistro) = %s and day(p.fecharegistro) >= 5))"
+					cursor.execute(consulta, (i[0],i[4], mes, mes, mesant))
 					totalmes = cursor.fetchone()
 					try:
-						totalmes = float(totalmes[0])
+						totalmes = float(totalmes[0]) 
 					except:
 						totalmes = 0
 					try:
@@ -679,7 +697,7 @@ def montofacturarexcel():
 	tittle_style = xlwt.XFStyle()
 	tittle_style.font = tittle_font
 
-
+	
 
 	sh.write(0,0,"Montos a Facturar", tittle_style)
 
@@ -699,7 +717,7 @@ def montofacturarexcel():
 		sh.write(i+4,4,data[i][0], content_style)
 		sh.write(i+4,5,data[i][1], content_style)
 		sh.write(i+4,6,data[i][2], content_style)
-
+	
 	sh.col(0).width = 18 * 256
 	sh.col(1).width = 24 * 256
 	sh.col(2).width = 28 * 256
@@ -717,7 +735,7 @@ def montofacturarexcel():
 def montofact(id):
 	meses = [[1, "Enero"], [2, "Febrero"], [3, "Marzo"], [4, "Abril"], [5, "Mayo"], [6, "Junio"], [7, "Julio"], [8, "Agosto"], [9, "Septiembre"], [10, "Octubre"], [11, "Noviembre"], [12, "Diciembre"]]
 	try:
-		conexion = pymysql.connect(host='servicioalcliente.mysql.pythonanywhere-services.com', user='servicioalclient', password='Xela77590server', db='servicioalclient$catedraticos')
+		conexion = pymysql.connect(host=Conhost, user=Conuser, password=Conpassword, db=Condb)
 		try:
 			with conexion.cursor() as cursor:
 				consulta = "SELECT c.idcatedratico, c.nombre, c.apellido, c.correo, c.telefono, n.abreviatura from catedratico c inner join nivelacademico n on c.idnivelacademico = n.idnivelacademico where c.idcatedratico = %s"
@@ -731,6 +749,7 @@ def montofact(id):
 					cursor.execute(consulta, (id,i+1,i+2))
 					num = cursor.fetchone()
 					consulta = "SELECT c.nombre, c.horainicio, c.horafin, a.codigo, DATE_FORMAT(p.fecha,'%d/%m/%Y'), p.idperiodos, p.idestado, p.precio, c.seccion, DATE_FORMAT(p.fecharegistro,'%d/%m/%Y'), p.formadepago from clase c inner join carrera a on a.idcarrera = c.idcarrera inner join periodos p on p.idclase = c.idclase where c.idcatedratico = " + str(id) + " and p.idestado = 2 and p.liquidado = 0 and ((month(p.fecharegistro) = "+ str(i+1) +" and day(p.fecharegistro) >= 5) or (month(p.fecharegistro) = "+ str(i+2) +" and day(p.fecharegistro) < 5)) order by p.fecha"
+					print(consulta)
 					cursor.execute(consulta)
 					periodos = cursor.fetchall()
 					total = 0
@@ -755,14 +774,14 @@ def montofact(id):
 
 	#Generate barcode and render as image
 	my_barcode = barcode_format(number, writer=ImageWriter())
-
+	
 	#Save barcode as PNG
-	aux = "static/barcodes/" + catedratico[1] + '_' + catedratico[2]
+	aux = "flaskapp\\static\\barcodes\\" + catedratico[1] + '_' + catedratico[2]
 	my_barcode.save(aux)
 	if request.method == 'POST':
 		for i in range(12):
 			try:
-				conexion = pymysql.connect(host='servicioalcliente.mysql.pythonanywhere-services.com', user='servicioalclient', password='Xela77590server', db='servicioalclient$catedraticos')
+				conexion = pymysql.connect(host=Conhost, user=Conuser, password=Conpassword, db=Condb)
 				try:
 					with conexion.cursor() as cursor:
 						consulta = "SELECT p.idperiodos from periodos p inner join clase c on c.idclase = p.idclase where c.idcatedratico = %s and p.idestado = 2 and p.liquidado = 0 and ((month(p.fecharegistro) = %s and day(p.fecharegistro) >= 5) or (month(p.fecharegistro) = %s and day(p.fecharegistro) < 5))"
@@ -785,19 +804,19 @@ def montofact(id):
 										consulta = "UPDATE periodos set liquidado = 1, factura = %s where idperiodos = %s"
 										cursor.execute(consulta, (auxfacturai, j[0]))
 										conexion.commit()
-
+								
 				finally:
 					conexion.close()
 			except (pymysql.err.OperationalError, pymysql.err.InternalError) as e:
 				print("Ocurrió un error al conectar: ", e)
-
+			
 		return redirect(url_for('montofacturar'))
 	return render_template('montofact.html', title="Monto a Facturar", catedratico=catedratico, periodosmeses = periodosmeses, meses=meses, totales = totales)
 
 @app.route('/registrarcheque', methods=['GET', 'POST'])
 def registrarcheque():
 	try:
-		conexion = pymysql.connect(host='servicioalcliente.mysql.pythonanywhere-services.com', user='servicioalclient', password='Xela77590server', db='servicioalclient$catedraticos')
+		conexion = pymysql.connect(host=Conhost, user=Conuser, password=Conpassword, db=Condb)
 		try:
 			with conexion.cursor() as cursor:
 				consulta = "SELECT c.idcatedratico, c.nombre, c.apellido, n.abreviatura, sum(p.precio), p.factura, p.cheque from catedratico c inner join nivelacademico n on c.idnivelacademico = n.idnivelacademico inner join clase a on c.idcatedratico = a.idcatedratico inner join periodos p on a.idclase = p.idclase where p.factura != '0' and (p.cheque = '0' or p.cheque IS Null) group by p.factura, c.nombre, c.apellido, n.abreviatura order by n.abreviatura, c.nombre;"
@@ -810,7 +829,7 @@ def registrarcheque():
 		print("Ocurrió un error al conectar: ", e)
 	if request.method == 'POST':
 		try:
-			conexion = pymysql.connect(host='servicioalcliente.mysql.pythonanywhere-services.com', user='servicioalclient', password='Xela77590server', db='servicioalclient$catedraticos')
+			conexion = pymysql.connect(host=Conhost, user=Conuser, password=Conpassword, db=Condb)
 			try:
 				with conexion.cursor() as cursor:
 					for i in catedraticos:
@@ -832,7 +851,7 @@ def registrarcheque():
 def reportepdf(id):
 	meses = [[1, "Enero"], [2, "Febrero"], [3, "Marzo"], [4, "Abril"], [5, "Mayo"], [6, "Junio"], [7, "Julio"], [8, "Agosto"], [9, "Septiembre"], [10, "Octubre"], [11, "Noviembre"], [12, "Diciembre"]]
 	try:
-		conexion = pymysql.connect(host='servicioalcliente.mysql.pythonanywhere-services.com', user='servicioalclient', password='Xela77590server', db='servicioalclient$catedraticos')
+		conexion = pymysql.connect(host=Conhost, user=Conuser, password=Conpassword, db=Condb)
 		try:
 			with conexion.cursor() as cursor:
 				consulta = "SELECT c.idcatedratico, c.nombre, c.apellido, c.correo, c.telefono, n.abreviatura from catedratico c inner join nivelacademico n on c.idnivelacademico = n.idnivelacademico where c.idcatedratico = %s"
@@ -862,14 +881,13 @@ def reportepdf(id):
 			conexion.close()
 	except (pymysql.err.OperationalError, pymysql.err.InternalError) as e:
 		print("Ocurrió un error al conectar: ", e)
-
 	html = render_template('reportepdf.html', title="Monto a Facturar", catedratico=catedratico, periodosmeses = periodosmeses, meses=meses, totales = totales)
 	return render_pdf(HTML(string=html))
 
 @app.route('/historico', methods=['GET', 'POST'])
 def historico():
 	try:
-		conexion = pymysql.connect(host='servicioalcliente.mysql.pythonanywhere-services.com', user='servicioalclient', password='Xela77590server', db='servicioalclient$catedraticos')
+		conexion = pymysql.connect(host=Conhost, user=Conuser, password=Conpassword, db=Condb)
 		try:
 			with conexion.cursor() as cursor:
 				cursor.execute("SELECT c.idcatedratico, c.nombre, c.apellido, n.abreviatura from catedratico c inner join nivelacademico n on c.idnivelacademico = n.idnivelacademico order by n.abreviatura, c.nombre;")
@@ -887,7 +905,7 @@ def catedraticohistorico(id):
 	desde = 0
 	hasta = 0
 	try:
-		conexion = pymysql.connect(host='servicioalcliente.mysql.pythonanywhere-services.com', user='servicioalclient', password='Xela77590server', db='servicioalclient$catedraticos')
+		conexion = pymysql.connect(host=Conhost, user=Conuser, password=Conpassword, db=Condb)
 		try:
 			with conexion.cursor() as cursor:
 				consulta = "SELECT c.idcatedratico, c.nombre, c.apellido, c.correo, c.telefono, n.abreviatura from catedratico c inner join nivelacademico n on c.idnivelacademico = n.idnivelacademico where c.idcatedratico = %s"
@@ -909,9 +927,9 @@ def catedraticohistorico(id):
 
 	#Generate barcode and render as image
 	my_barcode = barcode_format(number, writer=ImageWriter())
-
+	
 	#Save barcode as PNG
-	aux = "static/barcodes/" + catedratico[1] + '_' + catedratico[2]
+	aux = "flaskapp\\static\\barcodes\\" + catedratico[1] + '_' + catedratico[2]
 	my_barcode.save(aux)
 	if request.method == 'POST':
 		boton = request.form["varaux"]
@@ -919,11 +937,11 @@ def catedraticohistorico(id):
 		hasta = request.form["hasta"]
 		if "fechas" in boton:
 			try:
-				conexion = pymysql.connect(host='servicioalcliente.mysql.pythonanywhere-services.com', user='servicioalclient', password='Xela77590server', db='servicioalclient$catedraticos')
+				conexion = pymysql.connect(host=Conhost, user=Conuser, password=Conpassword, db=Condb)
 				try:
 					with conexion.cursor() as cursor:
-						consulta = """SELECT c.nombre, DATE_FORMAT(p.fecha,'%d/%m/%Y'), c.horainicio, c.horafin, a.codigo, c.seccion, p.precio, p.idestado, p.liquidado, p.factura, p.cheque, p.idperiodos, p.formadepago
-						from clase c inner join periodos p on c.idclase = p.idclase inner join carrera a on a.idcarrera = c.idcarrera inner join estado e on e.idestado = p.idestado
+						consulta = """SELECT c.nombre, DATE_FORMAT(p.fecha,'%d/%m/%Y'), c.horainicio, c.horafin, a.codigo, c.seccion, p.precio, p.idestado, p.liquidado, p.factura, p.cheque, p.idperiodos, p.formadepago,DATE_FORMAT(p.fecharegistro,'%d/%m/%Y')
+						from clase c inner join periodos p on c.idclase = p.idclase inner join carrera a on a.idcarrera = c.idcarrera inner join estado e on e.idestado = p.idestado 
 						where p.fecha >= '""" + str(desde) + "' and p.fecha <= '" + str(hasta)
 						consulta = consulta + "' and c.idcatedratico = " + str(id) + " order by p.fecha, c.horainicio asc"
 						cursor.execute(consulta)
@@ -935,11 +953,11 @@ def catedraticohistorico(id):
 				print("Ocurrió un error al conectar: ", e)
 		else:
 			try:
-				conexion = pymysql.connect(host='servicioalcliente.mysql.pythonanywhere-services.com', user='servicioalclient', password='Xela77590server', db='servicioalclient$catedraticos')
+				conexion = pymysql.connect(host=Conhost, user=Conuser, password=Conpassword, db=Condb)
 				try:
 					with conexion.cursor() as cursor:
-						consulta = """SELECT c.nombre, DATE_FORMAT(p.fecha,'%d/%m/%Y'), c.horainicio, c.horafin, a.codigo, c.seccion, p.precio, p.idestado, p.liquidado, p.factura, p.cheque, p.idperiodos, p.formadepago
-						from clase c inner join periodos p on c.idclase = p.idclase inner join carrera a on a.idcarrera = c.idcarrera inner join estado e on e.idestado = p.idestado
+						consulta = """SELECT c.nombre, DATE_FORMAT(p.fecha,'%d/%m/%Y'), c.horainicio, c.horafin, a.codigo, c.seccion, p.precio, p.idestado, p.liquidado, p.factura, p.cheque, p.idperiodos, p.formadepago, DATE_FORMAT(p.fecharegistro,'%d/%m/%Y')
+						from clase c inner join periodos p on c.idclase = p.idclase inner join carrera a on a.idcarrera = c.idcarrera inner join estado e on e.idestado = p.idestado 
 						where p.fecha >= '""" + str(desde) + "' and p.fecha <= '" + str(hasta)
 						consulta = consulta + "' and c.idcatedratico = " + str(id) + " order by p.fecha, c.horainicio asc"
 						cursor.execute(consulta)
@@ -949,11 +967,11 @@ def catedraticohistorico(id):
 						for i in periodos:
 							aux = 'periodo' + str(i[11])
 							estadoaux = request.form[aux]
-							consulta = "UPDATE periodos set idestado = " + str(estadoaux) + " where idperiodos = " + str(i[11])
+							consulta = "UPDATE periodos set idestado = " + str(estadoaux) + ", fecharegistro = CURDATE() where idperiodos = " + str(i[11])
 							cursor.execute(consulta)
 							conexion.commit()
-						consulta = """SELECT c.nombre, DATE_FORMAT(p.fecha,'%d/%m/%Y'), c.horainicio, c.horafin, a.codigo, c.seccion, p.precio, p.idestado, p.liquidado, p.factura, p.cheque, p.idperiodos, p.formadepago
-						from clase c inner join periodos p on c.idclase = p.idclase inner join carrera a on a.idcarrera = c.idcarrera inner join estado e on e.idestado = p.idestado
+						consulta = """SELECT c.nombre, DATE_FORMAT(p.fecha,'%d/%m/%Y'), c.horainicio, c.horafin, a.codigo, c.seccion, p.precio, p.idestado, p.liquidado, p.factura, p.cheque, p.idperiodos, p.formadepago, DATE_FORMAT(p.fecharegistro,'%d/%m/%Y')
+						from clase c inner join periodos p on c.idclase = p.idclase inner join carrera a on a.idcarrera = c.idcarrera inner join estado e on e.idestado = p.idestado 
 						where p.fecha >= '""" + str(desde) + "' and p.fecha <= '" + str(hasta)
 						consulta = consulta + "' and c.idcatedratico = " + str(id) + " order by p.fecha, c.horainicio asc"
 						cursor.execute(consulta)
@@ -966,4 +984,4 @@ def catedraticohistorico(id):
 	return render_template('catedraticohistorico.html', title="Histórico", periodos=periodos, catedratico = catedratico, desde = desde, hasta = hasta, estados = estados)
 
 if __name__ == '__main__':
-	app.run(host='0.0.0.0', port=5005, threaded=True, debug=True)
+	app.run(host='0.0.0.0', port=5004, threaded=True, debug=True)
