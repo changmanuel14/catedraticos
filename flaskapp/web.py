@@ -548,8 +548,8 @@ def montofacturar():
 				cantidad = len(catedraticos)
 				data = []
 				for i in catedraticos:
-					consulta = "SELECT sum(p.precio) from periodos p inner join clase c on c.idclase = p.idclase where c.idcatedratico = %s and p.idestado = 2 and p.liquidado = 0 and p.formadepago = %s and ((month(p.fecharegistro) < %s) or (month(p.fecharegistro) = %s and day(p.fecharegistro < 5)))"
-					cursor.execute(consulta, (i[0], i[4], mes, mes))
+					consulta = "SELECT sum(p.precio) from periodos p inner join clase c on c.idclase = p.idclase where c.idcatedratico = %s and p.formadepago = %s and p.idestado = 2 and p.liquidado = 0 and month(p.fecha) < %s and ((month(p.fecharegistro) = %s and day(p.fecharegistro) < 5) or (month(p.fecharegistro) < %s));"
+					cursor.execute(consulta, (i[0],i[4], mes, mes, mes))
 					total = cursor.fetchone()
 					consulta = "SELECT sum(p.precio) from periodos p inner join clase c on c.idclase = p.idclase where c.idcatedratico = %s and p.formadepago = %s and p.idestado = 2 and p.liquidado = 0 and month(p.fecha) < %s and ((month(p.fecharegistro) = %s and day(p.fecharegistro) < 5) or (month(p.fecharegistro) = %s and day(p.fecharegistro) >= 5))"
 					cursor.execute(consulta, (i[0],i[4], mes, mes, mesant))
@@ -593,8 +593,8 @@ def montofacturarpdf():
 				cantidad = len(catedraticos)
 				data = []
 				for i in catedraticos:
-					consulta = "SELECT sum(p.precio) from periodos p inner join clase c on c.idclase = p.idclase where c.idcatedratico = %s and p.idestado = 2 and p.liquidado = 0 and p.formadepago = %s and ((month(p.fecharegistro) < %s) or (month(p.fecharegistro) = %s and day(p.fecharegistro < 5)))"
-					cursor.execute(consulta, (i[0], i[4], mes, mes))
+					consulta = "SELECT sum(p.precio) from periodos p inner join clase c on c.idclase = p.idclase where c.idcatedratico = %s and p.formadepago = %s and p.idestado = 2 and p.liquidado = 0 and month(p.fecha) < %s and ((month(p.fecharegistro) = %s and day(p.fecharegistro) < 5) or (month(p.fecharegistro) < %s));"
+					cursor.execute(consulta, (i[0],i[4], mes, mes, mes))
 					total = cursor.fetchone()
 					consulta = "SELECT sum(p.precio) from periodos p inner join clase c on c.idclase = p.idclase where c.idcatedratico = %s and p.formadepago = %s and p.idestado = 2 and p.liquidado = 0 and month(p.fecha) < %s and ((month(p.fecharegistro) = %s and day(p.fecharegistro) < 5) or (month(p.fecharegistro) = %s and day(p.fecharegistro) >= 5))"
 					cursor.execute(consulta, (i[0],i[4], mes, mes, mesant))
@@ -639,8 +639,8 @@ def montofacturarexcel():
 				cantidad = len(catedraticos)
 				data = []
 				for i in catedraticos:
-					consulta = "SELECT sum(p.precio) from periodos p inner join clase c on c.idclase = p.idclase where c.idcatedratico = %s and p.idestado = 2 and p.liquidado = 0 and p.formadepago = %s and ((month(p.fecharegistro) < %s) or (month(p.fecharegistro) = %s and day(p.fecharegistro < 5)))"
-					cursor.execute(consulta, (i[0], i[4], mes, mes))
+					consulta = "SELECT sum(p.precio) from periodos p inner join clase c on c.idclase = p.idclase where c.idcatedratico = %s and p.formadepago = %s and p.idestado = 2 and p.liquidado = 0 and month(p.fecha) < %s and ((month(p.fecharegistro) = %s and day(p.fecharegistro) < 5) or (month(p.fecharegistro) < %s));"
+					cursor.execute(consulta, (i[0],i[4], mes, mes, mes))
 					total = cursor.fetchone()
 					consulta = "SELECT sum(p.precio) from periodos p inner join clase c on c.idclase = p.idclase where c.idcatedratico = %s and p.formadepago = %s and p.idestado = 2 and p.liquidado = 0 and month(p.fecha) < %s and ((month(p.fecharegistro) = %s and day(p.fecharegistro) < 5) or (month(p.fecharegistro) = %s and day(p.fecharegistro) >= 5))"
 					cursor.execute(consulta, (i[0],i[4], mes, mes, mesant))
