@@ -227,6 +227,25 @@ def eliminarclase(id):
 		print("Ocurrió un error al conectar: ", e)
 	return redirect(url_for('periodoscat', id = catedraticos[0]))
 
+@app.route('/deshabilitarclase/<id>', methods=['GET', 'POST'])
+def deshabilitarclase(id):
+	try:
+		conexion = pymysql.connect(host=Conhost, user=Conuser, password=Conpassword, db=Condb)
+		try:
+			with conexion.cursor() as cursor:
+				consulta = f"SELECT c.idcatedratico, c.nombre, c.apellido, n.abreviatura from catedratico c inner join nivelacademico n on c.idnivelacademico = n.idnivelacademico inner join clase l on c.idcatedratico = l.idcatedratico where l.idclase = {id} order by n.abreviatura, c.nombre;"
+				cursor.execute(consulta)
+			# Con fetchall traemos todas las filas
+				catedraticos = cursor.fetchone()
+				consulta = f"update periodos set idestado = 5 WHERE idclase = {str(id)}"
+				cursor.execute(consulta)
+			conexion.commit()
+		finally:
+			conexion.close()
+	except (pymysql.err.OperationalError, pymysql.err.InternalError) as e:
+		print("Ocurrió un error al conectar: ", e)
+	return redirect(url_for('periodoscat', id = catedraticos[0]))
+
 @app.route('/periodos')
 def periodos():
 	return render_template('periodos.html', title="Periodos")
