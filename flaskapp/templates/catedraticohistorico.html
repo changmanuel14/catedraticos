@@ -8,7 +8,7 @@
 </div>
 
 <div style="width: 25%; float: right;">
-	<img src="/static/barcodes/{{catedratico[1]}}_{{catedratico[2]}}.png" width="100%"> 
+	<img src="/static/barcodes/{{catedratico[1]}}_{{catedratico[2]}}.png" width="100%">
 </div>
 <br><br><br><br><br><br><br><br>
 <form action="" method="POST">
@@ -23,6 +23,12 @@
 			<label for="hasta">Hasta</label>
 			<input type="date" class="form-control" id="hasta" name="hasta" placeholder="Fecha Fin" value="{{hasta}}">
 		  </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group col-md-12">
+          <label for="curso">Curso</label>
+          <input type="text" class="form-control" id="curso" name="curso" placeholder="Curso" value="{{curso}}">
+        </div>
       </div>
 	  <center><button type="submit" class="btn btn-primary">Filtrar Fechas</button></center>
 	</form>
@@ -82,6 +88,7 @@
 <input type="hidden" name="varaux" value="estados">
 <input type="hidden" name="desde" value="{{desde}}">
 <input type="hidden" name="hasta" value="{{hasta}}">
+<input type="hidden" name="curso" value="{{curso}}">
 <button type="submit" class="btn btn-primary">Aceptar</button>
 </form>
 

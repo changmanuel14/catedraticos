@@ -5,6 +5,7 @@
 <a href="/montofacturarpdf" target="_blank"><button class="btn btn-info">Exportar PDF</button></a>  <a href="/montofacturarexcel"><button class="btn btn-info">Exportar Excel</button></a>
 <table class="table table-striped sortable">
 	<tr>
+	    <th>No.</th>
 		<th>Grado<br>académico</th>
 		<th>Nombre</th>
 		<th>Apellido</th>
@@ -15,8 +16,9 @@
 		<th>Opciones</th>
 	</tr>
 	{% for i in range(cantidad) %}
-	
+
 		<tr>
+		    <td>{{i+1}}</td>
 			<td>{{catedraticos[i][3]}}</td>
 			<td>{{catedraticos[i][1]}}</td>
 			<td>{{catedraticos[i][2]}}</td>
@@ -27,7 +29,7 @@
 
 			<td><a href="/montofact/{{catedraticos[i][0]}}"><button class="btn btn-info">Ver Montos</button></a></td>
 		</tr>
-	
+
 	{% endfor %}
 
 </table>

@@ -16,15 +16,17 @@
 <center>
 	<h3>Buen dia, estimado catedrático</h3>
 	{% if estado == 0 %}
-	<h5>Estado: Entrada</h5>
-	<h4>Sus periodos para el dia de hoy son los siguientes:</h4>
+	<h5>Bienvenido</h5>
+	<h4 style="color: red">Usted esta marcando periodos de entrada, recuerde que solo tiene 10 minutos para marcar su entrada, pasado el inicio de clases.</h4>
+	<h4 style="color: red">Recuerde que debe marcar su salida para que los periodos sean registrados.</h4>
+	<h4>Los periodos que quedarán anotados para el dia de hoy son los siguientes:</h4>
 	{% elif estado == 1 %}
-	<h5>Estado: Salida</h5>
-	<h4>Sus periodos registrados el dia de hoy son:</h4>
+	<h4 style="color: green">Usted esta marcando periodos de salida, recuerde que debe esperar la hora de finalización de clases.</h4>
+	<h4 style="color: green">Al darle click en "Aceptar", se registrarán los periodos. Sus periodos registrados el dia de hoy son:</h4>
 	{% endif %}
 </center>
 
-<form action="" method="POST">
+<form action="" method="POST"  onsubmit="return alert('Datos registrados');">
 	<table class="table table-striped sortable">
 		<tr>
 			<th>Nombre</th>
@@ -49,14 +51,31 @@
 			<td>{{i[7]}}</td>
 			{% if estado == 0 %}
 			<td>
-				<input type="checkbox" data-toggle="toggle" id="check{{i[0]}}">
+				<input type="checkbox" data-toggle="toggle" id="check{{i[0]}}" checked>
 			</td>
 			{% endif %}
 		</tr>
 
 {% endfor %}
 </table>
+{% if mensajeini == 1 %}
+<h4 style="color: red">Aun no puede marcar salida porque su horario no ha finalizado. Por favor, intente nuevamente cuando su horario haya finalizado.</h4>
+<button type="submit" disabled class="btn btn-danger">Aceptar</button>
+{% else %}
 <button type="submit" class="btn btn-primary">Aceptar</button>
+{% endif %}
+
 </form>
+<script>
+    window.onload = function(){
+        var mensaje = {{ mensajeini }}
+        console.log(mensaje)
+        if(mensaje == 1) {
+            return alert("Sus periodos aun no han finalizado");
+        }else {
+            return 0;
+        }
+    }
+</script>
 
 {% endblock %}

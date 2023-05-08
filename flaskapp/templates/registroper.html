@@ -9,7 +9,7 @@
 </div>
 
 <div style="width: 25%; float: right;">
-	<img src="/static/barcodes/{{catedratico[1]}}_{{catedratico[2]}}.png" width="100%"> 
+	<img src="/static/barcodes/{{catedratico[1]}}_{{catedratico[2]}}.png" width="100%">
 </div>
 <br><br><br><br><br><br><br><br>
 
@@ -24,11 +24,12 @@
 			<th>Sección</th>
 			<th>Modalidad</th>
 			<th>Estado</th>
+			<th>Fecha Registro</th>
 		</tr>
 {% for i in meses %}
 {% if periodosmeses[i[0]-1][1] > 0 %}
 	<tr>
-		<th colspan="8"><center>{{i[1]}}</center></th>
+		<th colspan="9"><center>{{i[1]}}</center></th>
 	</tr>
 	{% for j in periodosmeses[i[0]-1][2] %}
 	<tr>
@@ -58,6 +59,11 @@
 				</select>
 			  </div>
 		</td>
+		<td>
+		    <div class="form-group col-md-12">
+				<input type="date" class="form-control" id="fecharegistro{{j[5]}}" name="fecharegistro{{j[5]}}" value="{{hoy}}">
+			  </div>
+		</td>
 	</tr>
 	{% endfor %}
 
@@ -81,7 +87,7 @@
 		}
 		etiqueta.innerHTML = 'Periodos Registrados: ' + String(cont)
 	  }
-	  
+
   </script>
 
 
