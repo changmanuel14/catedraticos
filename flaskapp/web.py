@@ -57,9 +57,9 @@ def presenciales(idcatedratico):
 				cursor.execute(consulta, idcatedratico)
 				catedratico = cursor.fetchone()
 				if len(periodostarde) > 0:
-				    mensajeini = 1
+					mensajeini = 1
 				else:
-				    mensajeini = 0
+					mensajeini = 0
 		finally:
 			conexion.close()
 	except (pymysql.err.OperationalError, pymysql.err.InternalError) as e:
@@ -1031,9 +1031,9 @@ def entradas():
 				with conexion.cursor() as cursor:
 					consulta = "SELECT d.nombre, d.apellido, e.fecha, e.horaentrada, e.horasalida from catedratico d inner join entradas e on e.idcatedratico = d.idcatedratico where e.idcatedratico = " + str(catedratico) + " "
 					if len(desde) > 0:
-					    consulta = consulta + "and e.fecha >= '" + str(desde) + "' "
+						consulta = consulta + "and e.fecha >= '" + str(desde) + "' "
 					if len(hasta) > 0:
-					    consulta = consulta + "and e.fecha <= '" + str(hasta) + "' "
+						consulta = consulta + "and e.fecha <= '" + str(hasta) + "' "
 					consulta = consulta + "order by e.fecha desc;"
 					print(consulta)
     			# Con fetchall traemos todas las filas
