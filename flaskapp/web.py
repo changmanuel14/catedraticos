@@ -237,7 +237,7 @@ def deshabilitarclase(id):
 				cursor.execute(consulta)
 			# Con fetchall traemos todas las filas
 				catedraticos = cursor.fetchone()
-				consulta = f"update periodos set idestado = 5 WHERE idclase = {str(id)}"
+				consulta = f"update periodos set idestado = 5 WHERE idclase = {str(id)} and idestado = 1"
 				cursor.execute(consulta)
 			conexion.commit()
 		finally:
