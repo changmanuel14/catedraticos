@@ -15,6 +15,7 @@
 		<th>Total</th>
 		<th>Opciones</th>
 	</tr>
+	{% if cantidad > 0 %}
 	{% for i in range(cantidad) %}
 
 		<tr>
@@ -31,6 +32,7 @@
 		</tr>
 
 	{% endfor %}
+	{% endif %}
 
 </table>
 
