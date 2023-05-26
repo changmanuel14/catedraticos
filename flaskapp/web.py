@@ -11,7 +11,6 @@ from conexion import Conhost, Conuser, Conpassword, Condb
 app = Flask(__name__)
 app.secret_key = 'd589d3d0d15d764ed0a98ff5a37af547'
 
-
 @app.route('/', methods=['GET', 'POST'])
 def home():
 	mensaje = ""
@@ -1054,14 +1053,18 @@ def entradas():
 			conexion = pymysql.connect(host=Conhost, user=Conuser, password=Conpassword, db=Condb)
 			try:
 				with conexion.cursor() as cursor:
-					consulta = f"SELECT d.nombre, d.apellido, e.fecha, e.horaentrada, e.horasalida from catedratico d inner join entradas e on e.idcatedratico = d.idcatedratico where e.idcatedratico = {catedratico} "
-					if len(desde) > 0:
-						consulta = consulta + f"and e.fecha >= '{desde}' "
-					if len(hasta) > 0:
-						consulta = consulta + f"and e.fecha <= '{hasta}' "
-					consulta = consulta + "order by e.fecha desc;"
+					consulta = f"SELECT d.nombre, d.apellido, e.fecha, e.horaentrada, e.horasalida from catedratico d inner join entradas e on e.idcatedratico = d.idcatedratico "
+					if len(desde) > 0 or len(hasta) > 0 or len(catedratico) > 0:
+						consulta = consulta + "where "
+						if len(catedratico) > 0:
+							consulta = consulta + f"e.idcatedratico = {catedratico} "
+						if len(desde) > 0:
+							consulta = consulta + f"and e.fecha >= '{desde}' "
+						if len(hasta) > 0:
+							consulta = consulta + f"and e.fecha <= '{hasta}' "
+					consulta = consulta + "order by e.fecha, d.nombre desc;"
 					print(consulta)
-    			# Con fetchall traemos todas las filas
+					# Con fetchall traemos todas las filas
 					cursor.execute(consulta)
 					entradas = cursor.fetchall()
 					print(entradas)
