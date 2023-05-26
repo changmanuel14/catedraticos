@@ -1048,7 +1048,10 @@ def entradas():
 		desde = request.form["desde"]
 		hasta = request.form["hasta"]
 		catedratico = request.form["catedratico"]
-		catedratico = int(catedratico)
+		try:
+			catedratico = int(catedratico)
+		except:
+			catedratico = ""
 		try:
 			conexion = pymysql.connect(host=Conhost, user=Conuser, password=Conpassword, db=Condb)
 			try:
