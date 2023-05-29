@@ -1070,7 +1070,6 @@ def entradas():
 					# Con fetchall traemos todas las filas
 					cursor.execute(consulta)
 					entradas = cursor.fetchall()
-					print(entradas)
 			finally:
 				conexion.close()
 		except (pymysql.err.OperationalError, pymysql.err.InternalError) as e:
