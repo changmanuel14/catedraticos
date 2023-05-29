@@ -1062,9 +1062,13 @@ def entradas():
 						if len(catedratico) > 0:
 							consulta = consulta + f"e.idcatedratico = {catedratico} "
 						if len(desde) > 0:
-							consulta = consulta + f"and e.fecha >= '{desde}' "
+							if len(catedratico) > 0:
+								consulta = consulta + "and"
+							consulta = consulta + f" e.fecha >= '{desde}' "
 						if len(hasta) > 0:
-							consulta = consulta + f"and e.fecha <= '{hasta}' "
+							if len(catedratico) > 0 or len(desde) > 0:
+								consulta = consulta + "and"
+							consulta = consulta + f" e.fecha <= '{hasta}' "
 					consulta = consulta + "order by e.fecha, d.nombre desc;"
 					print(consulta)
 					# Con fetchall traemos todas las filas
