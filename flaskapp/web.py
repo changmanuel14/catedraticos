@@ -398,7 +398,7 @@ def periodoscatedratico():
 		conexion = pymysql.connect(host=Conhost, user=Conuser, password=Conpassword, db=Condb)
 		try:
 			with conexion.cursor() as cursor:
-				consulta = f"SELECT c.idcatedratico, c.nombre, c.apellido, n.abreviatura from catedratico c inner join nivelacademico n on c.idnivelacademico = n.idnivelacademico inner join clase l on l.idcatedratico = c.idcatedratico where l.fechafin >= '{str(hoy)}' group by c.idcatedratico, c.nombre, c.apellido, n.abreviatura order by n.abreviatura, c.nombre;" 
+				consulta = f"SELECT c.idcatedratico, c.nombre, c.apellido, n.abreviatura from catedratico c inner join nivelacademico n on c.idnivelacademico = n.idnivelacademico inner join clase l on l.idcatedratico = c.idcatedratico where l.fechafin >= '{str(hoy)}' group by c.idcatedratico, c.nombre, c.apellido, n.abreviatura order by n.abreviatura, c.nombre;"
 				cursor.execute(consulta)
 			# Con fetchall traemos todas las filas
 				catedraticos = cursor.fetchall()
@@ -452,7 +452,6 @@ def periodoscat(id):
 @app.route('/periodoscatpdf/<id>', methods=['GET', 'POST'])
 def periodoscatpdf(id):
 	dias = [[0, "Lunes"], [1, "Martes"], [2, "Miercoles"], [3, "Jueves"], [4, "Viernes"], [5, "Sabado"], [6, "Domingo"]]
-	hoy = datetime.date.today()
 	try:
 		conexion = pymysql.connect(host=Conhost, user=Conuser, password=Conpassword, db=Condb)
 		try:
@@ -1050,13 +1049,14 @@ def entradas():
 		catedratico = request.form["catedratico"]
 		try:
 			catedratico = int(catedratico)
+			catedratico = str(catedratico)
 		except:
 			catedratico = ""
 		try:
 			conexion = pymysql.connect(host=Conhost, user=Conuser, password=Conpassword, db=Condb)
 			try:
 				with conexion.cursor() as cursor:
-					consulta = f"SELECT d.nombre, d.apellido, e.fecha, e.horaentrada, e.horasalida from catedratico d inner join entradas e on e.idcatedratico = d.idcatedratico "
+					consulta = "SELECT d.nombre, d.apellido, e.fecha, e.horaentrada, e.horasalida from catedratico d inner join entradas e on e.idcatedratico = d.idcatedratico "
 					if len(desde) > 0 or len(hasta) > 0 or len(catedratico) > 0:
 						consulta = consulta + "where "
 						if len(catedratico) > 0:
