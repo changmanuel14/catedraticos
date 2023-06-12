@@ -1,25 +1,49 @@
 {% extends "layout.html" %}
 {% block content %}
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+
+<!-- Bootstrap CSS -->
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet"
+	integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+<!-- Bootstrap JS -->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+	integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+	crossorigin="anonymous"></script>
+
+<!-- fancyTable Js -->
+<script src="{{ url_for('static', filename='fancyTable.js') }}"></script>
 
 <h1>Catedraticos</h1>
 <a href="/nuevocatedratico"><button type="button" class="btn btn-success">Nuevo Catedratico</button></a>
 
-<table class="table table-striped sortable">
-    <tr>
-        <th>Profesión</th>
-        <th>Nombre</th>
-        <th>Apellido</th>
-        <th colspan="2">Opciones</th>
-    </tr>
-    {% for i in catedraticos %}
-    <tr>
-        <td>{{i[2]}}</td>
-        <td>{{i[0]}}</td>
-        <td>{{i[1]}}</td>
-        <td><a href="/editarcatedratico/{{i[3]}}"><button type="button" class="btn btn-primary">Editar</button></a></td>
-        <td><a href="/eliminarcatedratico/{{i[3]}}"><button type="button" class="btn btn-danger">Eliminar</button></a></td>
-    </tr>
-    {% endfor %}
+<table class="table table-striped sortable" id="sampleTable">
+	<tr>
+		<th>Profesión</th>
+		<th>Nombre</th>
+		<th>Apellido</th>
+		<th colspan="2">Opciones</th>
+	</tr>
+	{% for i in catedraticos %}
+	<tr>
+		<td>{{i[2]}}</td>
+		<td>{{i[0]}}</td>
+		<td>{{i[1]}}</td>
+		<td><a href="/editarcatedratico/{{i[3]}}"><button type="button" class="btn btn-primary">Editar</button></a></td>
+		<td><a href="/eliminarcatedratico/{{i[3]}}"><button type="button" class="btn btn-danger">Eliminar</button></a>
+		</td>
+	</tr>
+	{% endfor %}
 </table>
+
+<script>
+	$(document).ready(function () {
+		$("#sampleTable").fancyTable({
+			inputPlaceholder: 'Buscar',
+			pagination: true,
+			perPage:8
+		});
+	});
+</script>
 
 {% endblock %}

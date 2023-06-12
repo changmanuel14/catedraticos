@@ -1070,7 +1070,6 @@ def entradas():
 								consulta = consulta + "and"
 							consulta = consulta + f" e.fecha <= '{hasta}' "
 					consulta = consulta + "order by e.fecha, d.nombre desc;"
-					print(consulta)
 					# Con fetchall traemos todas las filas
 					cursor.execute(consulta)
 					entradas = cursor.fetchall()
