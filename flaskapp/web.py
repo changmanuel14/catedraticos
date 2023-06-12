@@ -419,12 +419,12 @@ def periodoscat(id):
 				cursor.execute(consulta)
 			# Con fetchall traemos todas las filas
 				catedratico = cursor.fetchone()
-				consulta = f"SELECT c.nombre, c.horainicio, c.horafin, DATE_FORMAT(c.fechainicio,'%d/%m/%Y'), DATE_FORMAT(c.fechafin,'%d/%m/%Y'), a.codigo, c.dia, c.seccion, c.modalidad, c.formadepago, c.idclase from clase c inner join carrera a on a.idcarrera = c.idcarrera  where c.idcatedratico = {id} and c.fechafin >= CURDATE() order by c.horainicio"
+				consulta = f"SELECT c.nombre, c.horainicio, c.horafin, DATE_FORMAT(c.fechainicio,'%d/%m/%Y'), DATE_FORMAT(c.fechafin,'%d/%m/%Y'), a.codigo, c.dia, c.seccion, c.modalidad, c.formadepago, c.idclase from clase c inner join carrera a on a.idcarrera = c.idcarrera  where c.idcatedratico = {id} and LAST_DAY(c.fechafin)  >= CURDATE() order by c.horainicio"
 				cursor.execute(consulta)
 				clases = cursor.fetchall()
 				clasesdias = []
 				for i in range(7):
-					consulta = f"SELECT count(dia) from clase where idcatedratico = {id} and dia = {i} and fechafin >= CURDATE()"
+					consulta = f"SELECT count(dia) from clase where idcatedratico = {id} and dia = {i} and LAST_DAY(fechafin) >= CURDATE()"
 					cursor.execute(consulta)
 					num = cursor.fetchone()
 					aux = []
