@@ -392,6 +392,48 @@ def editarclase(id):
 		return redirect(url_for('periodoscat', id = catedraticos[0]))
 	return render_template('editarclase.html', title="Editar Periodo", carreras = carreras, dias=dias, catedraticos = catedraticos, periodo=periodo, horas = horas,idclase=id)
 
+@app.route('/periodosclase', methods=['GET', 'POST'])
+def periodosclase():
+	try:
+		hoy = datetime.date.today()
+		conexion = pymysql.connect(host=Conhost, user=Conuser, password=Conpassword, db=Condb)
+		try:
+			with conexion.cursor() as cursor:
+				consulta = f"SELECT d.idcarrera, d.codigo, d.nombre, c.seccion from carrera d inner join clase c on c.idcarrera = d.idcarrera where c.fechafin >=CURDATE() group by d.codigo, d.nombre, c.seccion order by d.codigo, d.nombre, c.seccion;"
+				cursor.execute(consulta)
+			# Con fetchall traemos todas las filas
+				carreras = cursor.fetchall()
+		finally:
+			conexion.close()
+	except (pymysql.err.OperationalError, pymysql.err.InternalError) as e:
+		print("Ocurrió un error al conectar: ", e)
+	return render_template('periodosclase.html', title="Periodos por Clase", carreras=carreras)
+
+@app.route('/periodosclas/<idcarrera>&<seccion>', methods=['GET', 'POST'])
+def periodosclas(idcarrera, seccion):
+	dias = [[0, "Lunes"], [1, "Martes"], [2, "Miercoles"], [3, "Jueves"], [4, "Viernes"], [5, "Sabado"], [6, "Domingo"]]
+	try:
+		conexion = pymysql.connect(host=Conhost, user=Conuser, password=Conpassword, db=Condb)
+		try:
+			with conexion.cursor() as cursor:
+				consulta = f"SELECT c.nombre, c.codigo from carrera c where c.idcarrera = {idcarrera}"
+				cursor.execute(consulta)
+				carrera = cursor.fetchone()
+				clasesdias = []
+				cantidades = []
+				for i in range(7):
+					consulta = f"SELECT c.nombre, DATE_FORMAT(c.fechainicio,'%d/%m/%Y'), DATE_FORMAT(c.fechafin,'%d/%m/%Y'), c.horainicio, c.horafin, n.abreviatura, m.nombre, m.apellido, c.modalidad from carrera d inner join clase c on c.idcarrera = d.idcarrera inner join catedratico m on m.idcatedratico = c.idcatedratico inner join nivelacademico n on n.idnivelacademico = m.idnivelacademico where c.fechafin >=CURDATE() and c.idcarrera = {idcarrera} and c.seccion = '{seccion}' and c.dia = {i} order by c.dia, c.horainicio, c.nombre;"
+					cursor.execute(consulta)
+					clases = cursor.fetchall()
+					cantidad = len(clases)
+					cantidades.append(cantidad)
+					clasesdias.append(clases)
+		finally:
+			conexion.close()
+	except (pymysql.err.OperationalError, pymysql.err.InternalError) as e:
+		print("Ocurrió un error al conectar: ", e)
+	return render_template('periodosclas.html', title="Periodos por Clase", carrera=carrera, clasesdias = clasesdias, dias=dias, seccion=seccion, cantidades = cantidades)
+
 @app.route('/periodoscatedratico', methods=['GET', 'POST'])
 def periodoscatedratico():
 	try:

@@ -1,0 +1,37 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div style="width: 70%; float: left;">
+	<h1>Periodos por Sección</h1>
+	<h2>{{carrera[1]}} - {{carrera[0]}}</h2>
+	<h4>Sección: {{seccion}}</h4>
+</div>
+
+<br><br>
+
+
+<table class="table table-striped sortable" style="border:1px rgb(174, 172, 172) solid;">
+
+	{% for i in range(7) %}
+		{% if cantidades[i] != 0  %}
+		<tr>
+			<th style="border:1px rgb(174, 172, 172) solid; vertical-align: middle; text-align: center;">{{dias[i][1]}}</th>
+			{% for j in clasesdias[i] %}
+			<td style="border:1px rgb(174, 172, 172) solid;">
+				{{j[0]}}<br>
+				{{j[1]}} - {{j[2]}}<br>
+				{{j[3]}} - {{j[4]}}<br>
+				{{j[5]}} {{j[6]}} {{j[7]}}<br>
+				{% if j[8] == 0 %}
+				Virtual
+				{% elif j[8] == 1 %}
+				Presencial
+				{% endif %}
+			</td>
+			{% endfor %}
+		</tr>
+		{% endif %}
+	{% endfor %}
+</table>
+
+{% endblock %}
