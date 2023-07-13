@@ -362,11 +362,12 @@ def editarclase(id):
 					cursor.execute(consulta, (curso, seccion, carrera, horainicio, horafin, precio, modalidad, formadepago, fechainicio, fechafin, dia, id))
 					consulta = f"UPDATE periodos set precio = {precio} WHERE idclase = {id} and liquidado = 0 and idestado = 1"
 					cursor.execute(consulta)
+					consulta = f"UPDATE periodos set formadepago = '{formadepago}' WHERE idclase = {id} and liquidado = 0"
+					cursor.execute(consulta)
 					if str(dia) != str(periodo[11]):
 						consulta = f"DELETE FROM periodos where idclase = {id} and liquidado = 0 and idestado = 1 and fecha > '{str(hoy)}'"
 						cursor.execute(consulta)
 						arrfechafin = str(fechafin).split('-')
-
 						newfechainicio = datetime.date.today()
 						newfechafin = datetime.date(int(arrfechafin[0]), int(arrfechafin[1]), int(arrfechafin[2]))
 						print(newfechainicio.weekday())

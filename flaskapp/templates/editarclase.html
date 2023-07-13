@@ -77,9 +77,15 @@
 			  {% if periodo[8] == 'Cheque' %}
 			  <option value="Cheque" selected>Cheque</option>
 			  <option value="Efectivo">Efectivo</option>
+			  <option value="Cheque - Auxiliar de Enfermeria">Cheque - Auxiliar de Enfermeria</option>
 			{% elif periodo[8] == 'Efectivo' %}
 			<option value="Cheque">Cheque</option>
 			  <option value="Efectivo" selected>Efectivo</option>
+			  <option value="Cheque - Auxiliar de Enfermeria">Cheque - Auxiliar de Enfermeria</option>
+			  {% elif periodo[8] == 'Cheque - Auxiliar de Enfermeria' %}
+			<option value="Cheque">Cheque</option>
+			  <option value="Efectivo">Efectivo</option>
+			  <option value="Cheque - Auxiliar de Enfermeria" selected>Cheque - Auxiliar de Enfermeria</option>
 			{% endif %}
 
 			</select>
