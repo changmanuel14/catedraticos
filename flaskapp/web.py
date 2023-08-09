@@ -1122,6 +1122,3 @@ def entradas():
 			print("Ocurrió un error al conectar: ", e)
 
 	return render_template('entradas.html', title="Entradas", entradas=entradas, desde = desde, hasta = hasta, catedratico = catedratico, catedraticos = catedraticos)
-
-if __name__ == '__main__':
-	app.run(host='0.0.0.0', port=5004, threaded=True, debug=True)
