@@ -4,91 +4,95 @@
 <h1>Nuevo Periodo</h1>
 
 <form action="" method="POST">
-    <div class="form-row">
-        <div class="form-group col-md-6">
-          <label for="nombre">Curso</label>
-          <input type="text" class="form-control" id="curso" name="curso" placeholder="Curso" required>
-        </div>
+	<div class="form-row">
+		<div class="form-group col-md-6">
+			<label for="nombre">Curso</label>
+			<input type="text" class="form-control" id="curso" name="curso" placeholder="Curso" required>
+		</div>
 		<div class="form-group col-md-6">
 			<label for="carrera">Carrera</label>
 			<select id="carrera" name="carrera" class="form-control" required>
-			  <option selected>Seleccione la carrera</option>
-			  {% for i in carreras %}
-			  <option value="{{i[0]}}">{{i[1]}}</option>
-			  {% endfor %}
+				<option selected>Seleccione la carrera</option>
+				{% for i in carreras %}
+				<option value="{{i[0]}}">{{i[1]}}</option>
+				{% endfor %}
 			</select>
-		  </div>
-      </div>
-	  <div class="form-row">
-        <div class="form-group col-md-6">
-          <label for="fechainicio">Fecha Inicio</label>
-          <input type="date" class="form-control" id="fechainicio" name="fechainicio" placeholder="Fecha Inicio" required>
-        </div>
+		</div>
+	</div>
+	<div class="form-row">
+		<div class="form-group col-md-6">
+			<label for="fechainicio">Fecha Inicio</label>
+			<input type="date" class="form-control" id="fechainicio" name="fechainicio" placeholder="Fecha Inicio"
+				required>
+		</div>
 		<div class="form-group col-md-6">
 			<label for="fechafin">Fecha Fin</label>
 			<input type="date" class="form-control" id="fechafin" name="fechafin" placeholder="Fecha Fin" required>
-		  </div>
-      </div>
-      <div class="form-row">
+		</div>
+	</div>
+	<div class="form-row">
 		<div class="form-group col-md-6">
 			<label for="horainicio">Hora Inicio</label>
-			<input type="time" class="form-control" id="horainicio" name="horainicio" placeholder="Hora Inicio" required>
-		  </div>
-		  <div class="form-group col-md-6">
-			  <label for="horafin">Hora Fin</label>
-			  <input type="time" class="form-control" id="horafin" name="horafin" placeholder="Hora Fin" required>
-			</div>
-    </div>
+			<input type="time" class="form-control" id="horainicio" name="horainicio" placeholder="Hora Inicio"
+				required>
+		</div>
+		<div class="form-group col-md-6">
+			<label for="horafin">Hora Fin</label>
+			<input type="time" class="form-control" id="horafin" name="horafin" placeholder="Hora Fin" required>
+		</div>
+	</div>
 	<div class="form-row">
 		<div class="form-group col-md-6">
 			<label for="seccion">Sección</label>
 			<input type="text" class="form-control" id="seccion" name="seccion" placeholder="Sección" required>
-		  </div>
-		  <div class="form-group col-md-6">
-			  <label for="precio">Precio</label>
-			  <input type="number" step="0.01" class="form-control" id="precio" name="precio" placeholder="Precio" required>
-			</div>
-    </div>
+		</div>
+		<div class="form-group col-md-6">
+			<label for="precio">Precio</label>
+			<input type="number" step="0.01" class="form-control" id="precio" name="precio" placeholder="Precio"
+				required>
+		</div>
+	</div>
 	<div class="form-row">
 		<div class="form-group col-md-6">
-		  <label for="dia">Dia</label>
-		  <select id="dia" name="dia" class="form-control" required>
-			<option selected>Seleccione el dia de clase</option>
-			{% for i in dias %}
-			<option value="{{i[0]}}">{{i[1]}}</option>
-			{% endfor %}
-		  </select>
+			<label for="dia">Dia</label>
+			<select id="dia" name="dia" class="form-control" required>
+				<option selected>Seleccione el dia de clase</option>
+				{% for i in dias %}
+				<option value="{{i[0]}}">{{i[1]}}</option>
+				{% endfor %}
+			</select>
 		</div>
 		<div class="form-group col-md-6">
 			<label for="catedratico">Catedratico</label>
 			<select id="catedratico" name="catedratico" class="form-control" required>
-			  <option selected>Seleccione el catedrático</option>
-			  {% for i in catedraticos %}
-			  <option value="{{i[0]}}">{{i[3]}} {{i[1]}} {{i[2]}}</option>
-			  {% endfor %}
+				<option selected>Seleccione el catedrático</option>
+				{% for i in catedraticos %}
+				<option value="{{i[0]}}">{{i[3]}} {{i[1]}} {{i[2]}}</option>
+				{% endfor %}
 			</select>
-		  </div>
-	  </div>
-	  <div class="form-row">
+		</div>
+	</div>
+	<div class="form-row">
 		<div class="form-group col-md-6">
-		  <label for="modalidad">Modalidad</label>
-		  <select id="modalidad" name="modalidad" class="form-control" required>
-			<option selected>Seleccione la modalidad de clase</option>
-			<option value="0">Virtual</option>
-			<option value="1">Presencial</option>
-		  </select>
+			<label for="modalidad">Modalidad</label>
+			<select id="modalidad" name="modalidad" class="form-control" required>
+				<option selected>Seleccione la modalidad de clase</option>
+				<option value="0">Virtual</option>
+				<option value="1">Presencial</option>
+			</select>
 		</div>
 		<div class="form-group col-md-6">
 			<label for="formadepago">Forma de Pago</label>
 			<select id="formadepago" name="formadepago" class="form-control" required>
-			  <option selected>Seleccione la forma de pago</option>
-			  <option value="Cheque">Cheque</option>
-			  <option value="Efectivo">Efectivo</option>
-			  <option value="Cheque - Auxiliar de Enfermeria">Cheque - Auxiliar de Enfermeria</option>
+				<option selected>Seleccione la forma de pago</option>
+				<option value="Cheque">Cheque</option>
+				<option value="Efectivo">Efectivo</option>
+				<option value="Cheque - Auxiliar de Enfermeria">Cheque - Auxiliar de Enfermeria</option>
+				<option value="Cheque - Incluye Impuesto">Cheque - Incluye Impuesto</option>
 			</select>
-		  </div>
-	  </div>
-      <button type="submit" class="btn btn-primary">Aceptar</button>
+		</div>
+	</div>
+	<button type="submit" class="btn btn-primary">Aceptar</button>
 </form>
 
 {% endblock %}
