@@ -280,6 +280,7 @@ def nuevaclase():
 		catedratico = request.form["catedratico"]
 		modalidad = request.form["modalidad"]
 		formadepago = request.form["formadepago"]
+		plan = request.form["plan"]
 		try:
 			conexion = pymysql.connect(host=Conhost, user=Conuser, password=Conpassword, db=Condb)
 			try:
@@ -305,10 +306,11 @@ def nuevaclase():
 							idclase = idclase[0]
 							consulta = "INSERT INTO periodos(idclase,fecha,idestado, liquidado, precio, formadepago) VALUES (%s,%s,%s,%s,%s,%s);"
 							cursor.execute(consulta, (idclase, aux, 1, 0, precio, formadepago))
-							aux = aux + datetime.timedelta(days=7)
+							if plan == "Semanal":
+								aux = aux + datetime.timedelta(days=7)
+							elif plan == "Quincenal":
+								aux = aux + datetime.timedelta(days=14)
 						conexion.commit()
-
-
 			finally:
 				conexion.close()
 		except (pymysql.err.OperationalError, pymysql.err.InternalError) as e:
@@ -1122,3 +1124,6 @@ def entradas():
 			print("Ocurrió un error al conectar: ", e)
 
 	return render_template('entradas.html', title="Entradas", entradas=entradas, desde = desde, hasta = hasta, catedratico = catedratico, catedraticos = catedraticos)
+
+if __name__ == '__main__':
+	app.run(host='0.0.0.0', port=5003, threaded=True, debug=True)
