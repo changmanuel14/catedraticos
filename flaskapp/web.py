@@ -201,7 +201,7 @@ def editarcatedratico(id):
 				conexion.close()
 		except (pymysql.err.OperationalError, pymysql.err.InternalError) as e:
 			print("Ocurrió un error al conectar: ", e)
-		return redirect(url_for('catedraticos'))
+		return redirect(url_for('directoriocatedraticos'))
 	return render_template('editarcatedratico.html', title="Editar Catedratico", niveles = niveles, catedratico=catedratico)
 
 @app.route('/eliminarcatedratico/<id>', methods=['GET', 'POST'])
