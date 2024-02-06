@@ -105,6 +105,21 @@ def catedraticos():
 		print("Ocurrió un error al conectar: ", e)
 	return render_template('catedraticos.html', title="Catedraticos", catedraticos = catedraticos)
 
+@app.route('/directoriocatedraticos')
+def directoriocatedraticos():
+	try:
+		conexion = pymysql.connect(host=Conhost, user=Conuser, password=Conpassword, db=Condb)
+		try:
+			with conexion.cursor() as cursor:
+				cursor.execute("SELECT c.nombre, c.apellido, n.abreviatura, c.idcatedratico, c.telefono, c.correo from catedratico c inner join nivelacademico n on c.idnivelacademico = n.idnivelacademico order by n.abreviatura, c.nombre;")
+			# Con fetchall traemos todas las filas
+				catedraticos = cursor.fetchall()
+		finally:
+			conexion.close()
+	except (pymysql.err.OperationalError, pymysql.err.InternalError) as e:
+		print("Ocurrió un error al conectar: ", e)
+	return render_template('directoriocatedraticos.html', title="Directorio Catedraticos", catedraticos = catedraticos)
+
 @app.route('/nuevocatedratico', methods=['GET', 'POST'])
 def nuevocatedratico():
 	try:
@@ -1006,7 +1021,7 @@ def catedraticohistorico(id):
 	number = number + '01202346'
 	barcode_format = barcode.get_barcode_class('upc')
 
-	#Generate barcode and render as image
+	#Generate barcode and render as image 
 	my_barcode = barcode_format(number, writer=ImageWriter())
 
 	#Save barcode as PNG

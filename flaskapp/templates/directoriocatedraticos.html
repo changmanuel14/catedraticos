@@ -14,24 +14,25 @@
 <!-- fancyTable Js -->
 <script src="{{ url_for('static', filename='fancyTable.js') }}"></script>
 
-<h1>Catedraticos</h1>
-<a href="/nuevocatedratico"><button type="button" class="btn btn-success">Nuevo Catedratico</button></a> <a href="/directoriocatedraticos"><button type="button" class="btn btn-info">Directorio de Catedráticos</button></a>
+<h1>Directorio Catedraticos</h1>
 
 <table class="table table-striped sortable" id="sampleTable">
 	<tr>
 		<th>Profesión</th>
 		<th>Nombre</th>
 		<th>Apellido</th>
-		<th colspan="3">Opciones</th>
+		<th>Teléfono</th>
+		<th>Correo</th>
+		<th>Editar</th>
 	</tr>
 	{% for i in catedraticos %}
 	<tr>
 		<td>{{i[2]}}</td>
 		<td>{{i[0]}}</td>
 		<td>{{i[1]}}</td>
+		<td>{{i[4]}}</td>
+		<td>{{i[5]}}</td>
 		<td><a href="/editarcatedratico/{{i[3]}}"><button type="button" class="btn btn-primary">Editar</button></a></td>
-		<td><a href="/eliminarcatedratico/{{i[3]}}"><button type="button" class="btn btn-danger">Eliminar</button></a></td>
-		<td><a href="/periodoscat/{{i[3]}}"><button type="button" class="btn btn-info">Ver Horario</button></a></td>
 	</tr>
 	{% endfor %}
 </table>
