@@ -1000,6 +1000,7 @@ def catedraticohistorico(id):
 	desde = 0
 	hasta = 0
 	curso = ""
+	cantidad = 0
 	try:
 		conexion = pymysql.connect(host=Conhost, user=Conuser, password=Conpassword, db=Condb)
 		try:
@@ -1046,6 +1047,7 @@ def catedraticohistorico(id):
 						cursor.execute(consulta)
 					# Con fetchall traemos todas las filas
 						periodos = cursor.fetchall()
+						cantidad = len(periodos)
 				finally:
 					conexion.close()
 			except (pymysql.err.OperationalError, pymysql.err.InternalError) as e:
@@ -1064,6 +1066,7 @@ def catedraticohistorico(id):
 						cursor.execute(consulta)
 					# Con fetchall traemos todas las filas
 						periodos = cursor.fetchall()
+						cantidad = len(periodos)
 						for i in periodos:
 							aux = 'periodo' + str(i[11])
 							estadoaux = request.form[aux]
@@ -1079,11 +1082,12 @@ def catedraticohistorico(id):
 						cursor.execute(consulta)
 					# Con fetchall traemos todas las filas
 						periodos = cursor.fetchall()
+						cantidad = len(periodos)
 				finally:
 					conexion.close()
 			except (pymysql.err.OperationalError, pymysql.err.InternalError) as e:
 				print("Ocurrió un error al conectar: ", e)
-	return render_template('catedraticohistorico.html', title="Histórico", periodos=periodos, catedratico = catedratico, desde = desde, hasta = hasta, estados = estados, curso = curso)
+	return render_template('catedraticohistorico.html', title="Histórico", periodos=periodos, catedratico = catedratico, desde = desde, hasta = hasta, estados = estados, curso = curso, cantidad = cantidad)
 
 @app.route('/entradas', methods=['GET', 'POST'])
 def entradas():

@@ -3,8 +3,8 @@
 
 <h1>Editar Periodo</h1>
 
-<a href="/eliminarclase/{{idclase}}"><button class="btn btn-danger">Eliminar clase</button></a>
-<a href="/deshabilitarclase/{{idclase}}"><button class="btn btn-warning">Deshabilitar clase</button></a>
+<a href="/eliminarclase/{{idclase}}" onclick="return confirm('¿Estás seguro de eliminar?');"><button class="btn btn-danger">Eliminar clase</button></a>
+<a href="/deshabilitarclase/{{idclase}}" onclick="return confirm('¿Estás seguro de deshabilitar?');"><button class="btn btn-warning">Deshabilitar clase</button></a>
 
 <form action="" method="POST">
 	<div class="form-row">

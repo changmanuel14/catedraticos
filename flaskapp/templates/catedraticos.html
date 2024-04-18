@@ -30,7 +30,7 @@
 		<td>{{i[0]}}</td>
 		<td>{{i[1]}}</td>
 		<td><a href="/editarcatedratico/{{i[3]}}"><button type="button" class="btn btn-primary">Editar</button></a></td>
-		<td><a href="/eliminarcatedratico/{{i[3]}}"><button type="button" class="btn btn-danger">Eliminar</button></a></td>
+		<td><a href="/eliminarcatedratico/{{i[3]}}" onclick="return confirm('¿Estás seguro de eliminar?');"><button type="button" class="btn btn-danger">Eliminar</button></a></td>
 		<td><a href="/periodoscat/{{i[3]}}"><button type="button" class="btn btn-info">Ver Horario</button></a></td>
 	</tr>
 	{% endfor %}

@@ -14,82 +14,84 @@
 <form action="" method="POST">
 
 	<div class="form-row">
-        <div class="form-group col-md-6">
+		<div class="form-group col-md-6">
 			<input type="hidden" name="varaux" value="fechas">
-          <label for="desde">Desde</label>
-          <input type="date" class="form-control" id="desde" name="desde" placeholder="Fecha Inicio" value="{{desde}}">
-        </div>
+			<label for="desde">Desde</label>
+			<input type="date" class="form-control" id="desde" name="desde" placeholder="Fecha Inicio"
+				value="{{desde}}">
+		</div>
 		<div class="form-group col-md-6">
 			<label for="hasta">Hasta</label>
 			<input type="date" class="form-control" id="hasta" name="hasta" placeholder="Fecha Fin" value="{{hasta}}">
-		  </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group col-md-12">
-          <label for="curso">Curso</label>
-          <input type="text" class="form-control" id="curso" name="curso" placeholder="Curso" value="{{curso}}">
-        </div>
-      </div>
-	  <center><button type="submit" class="btn btn-primary">Filtrar Fechas</button></center>
-	</form>
-	<br>
-	<form action="" method="POST">
+		</div>
+	</div>
+	<div class="form-row">
+		<div class="form-group col-md-12">
+			<label for="curso">Curso</label>
+			<input type="text" class="form-control" id="curso" name="curso" placeholder="Curso" value="{{curso}}">
+		</div>
+	</div>
+	<center><button type="submit" class="btn btn-primary">Filtrar Fechas</button></center>
+	<h6>Registros: {{cantidad}}</h6>
+</form>
+<br>
+<form action="" method="POST">
 	<center><button type="submit" class="btn btn-primary">Guardar cambios Periodos</button></center>
-<table class="table table-striped sortable">
-	<tr>
-		<th>Nombre</th>
-		<th>Fecha</th>
-		<th>Fecha Registro</th>
-		<th>Hora Inicio</th>
-		<th>Hora Fin</th>
-		<th>Carrera</th>
-		<th>Sección</th>
-		<th>Precio</th>
-		<th>Forma de Pago</th>
-		<th>Estado</th>
-		<th>Pagado</th>
-		<th>Factura</th>
-		<th>Cheque</th>
-	</tr>
-	{% for i in periodos %}
-	<tr>
-		<td>{{i[0]}}</td>
-		<td>{{i[1]}}</td>
-		<td>{{i[13]}}</td>
-		<td>{{i[2]}}</td>
-		<td>{{i[3]}}</td>
-		<td>{{i[4]}}</td>
-		<td>{{i[5]}}</td>
-		<td>Q {{i[6]}}</td>
-		<td>{{i[12]}}</td>
-		<td>
-			<div class="form-group ">
-				<select class="form-control" id="periodo{{i[11]}}" name="periodo{{i[11]}}">
-					{% for j in estados %}
-					{% if i[7] | int == j[0] | int %}
-					<option value="{{j[0]}}" selected>{{j[1]}}</option>
-					{% else %}
-					<option value="{{j[0]}}">{{j[1]}}</option>
-					{% endif %}
-					{% endfor %}
-				</select>
-			</div>
-		</td>
-		{% if i[8] == 0 or i[8] == '0' %}
-		<td>No</td>
-		{% else %}
-		<td>Si</td>
-		{% endif %}
-		<td>{{i[9]}}</td>
-		<td>{{i[10]}}</td>
-	</tr>
-	{% endfor %}
-</table>
-<input type="hidden" name="varaux" value="estados">
-<input type="hidden" name="desde" value="{{desde}}">
-<input type="hidden" name="hasta" value="{{hasta}}">
-<input type="hidden" name="curso" value="{{curso}}">
-<button type="submit" class="btn btn-primary">Aceptar</button>
+	<table class="table table-striped sortable">
+		<tr>
+			<th>Nombre</th>
+			<th>Fecha</th>
+			<th>Fecha Registro</th>
+			<th>Hora Inicio</th>
+			<th>Hora Fin</th>
+			<th>Carrera</th>
+			<th>Sección</th>
+			<th>Precio</th>
+			<th>Forma de Pago</th>
+			<th>Estado</th>
+			<th>Pagado</th>
+			<th>Factura</th>
+			<th>Cheque</th>
+		</tr>
+		{% for i in periodos %}
+		<tr>
+			<td>{{i[0]}}</td>
+			<td>{{i[1]}}</td>
+			<td>{{i[13]}}</td>
+			<td>{{i[2]}}</td>
+			<td>{{i[3]}}</td>
+			<td>{{i[4]}}</td>
+			<td>{{i[5]}}</td>
+			<td>Q {{i[6]}}</td>
+			<td>{{i[12]}}</td>
+			<td>
+				<div class="form-group ">
+					<select class="form-control" id="periodo{{i[11]}}" name="periodo{{i[11]}}">
+						{% for j in estados %}
+						{% if i[7] | int == j[0] | int %}
+						<option value="{{j[0]}}" selected>{{j[1]}}</option>
+						{% else %}
+						<option value="{{j[0]}}">{{j[1]}}</option>
+						{% endif %}
+						{% endfor %}
+					</select>
+				</div>
+			</td>
+			{% if i[8] == 0 or i[8] == '0' %}
+			<td>No</td>
+			{% else %}
+			<td>Si</td>
+			{% endif %}
+			<td>{{i[9]}}</td>
+			<td>{{i[10]}}</td>
+		</tr>
+		{% endfor %}
+	</table>
+	<input type="hidden" name="varaux" value="estados">
+	<input type="hidden" name="desde" value="{{desde}}">
+	<input type="hidden" name="hasta" value="{{hasta}}">
+	<input type="hidden" name="curso" value="{{curso}}">
+	<button type="submit" class="btn btn-primary">Aceptar</button>
 </form>
 
 
