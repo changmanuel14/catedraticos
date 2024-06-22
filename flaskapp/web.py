@@ -539,6 +539,70 @@ def periodoscatpdf(id):
 	html = render_template('periodoscatpdf.html', title="Horario Catedratico", catedratico=catedratico, clases = clases, clasesdias = clasesdias, dias=dias)
 	return render_pdf(HTML(string=html))
 
+@app.route('/periodoscarrera', methods=['GET', 'POST'])
+def periodoscarrera():
+	carrera = 0
+	desde = 0
+	hasta = 0
+	anios = []
+	dataanios = []
+	meses = [[1, "Enero"], [2, "Febrero"], [3, "Marzo"], [4, "Abril"], [5, "Mayo"], [6, "Junio"], [7, "Julio"], [8, "Agosto"], [9, "Septiembre"], [10, "Octubre"], [11, "Noviembre"], [12, "Diciembre"]]
+	try:
+		conexion = pymysql.connect(host=Conhost, user=Conuser, password=Conpassword, db=Condb)
+		try:
+			with conexion.cursor() as cursor:
+				consulta = f"select idcarrera, codigo, nombre from carrera order by codigo;"
+				cursor.execute(consulta)
+			# Con fetchall traemos todas las filas
+				carreras = cursor.fetchall()
+		finally:
+			conexion.close()
+	except (pymysql.err.OperationalError, pymysql.err.InternalError) as e:
+		print("Ocurrió un error al conectar: ", e)
+	if request.method == 'POST':
+		desde = request.form["desde"]
+		hasta = request.form["hasta"]
+		carrera = request.form["carrera"]
+		try:
+			conexion = pymysql.connect(host=Conhost, user=Conuser, password=Conpassword, db=Condb)
+			try:
+				with conexion.cursor() as cursor:
+					consulta = "SELECT year(p.fecha) from periodos p inner join clase c on c.idclase = p.idclase where c.idcarrera = %s and c.fechainicio >= %s and c.fechafin <= %s group by year(p.fecha) order by year(p.fecha) asc;"
+					cursor.execute(consulta, (carrera, desde, hasta))
+					anios = cursor.fetchall()
+					dataanios = []
+					for i in anios:
+						datames  = []
+						for j in meses:
+							consulta = f"select n.abreviatura, d.nombre, d.apellido, count(p.idperiodos), d.idcatedratico from catedratico d inner join nivelacademico n on n.idnivelacademico = d.idnivelacademico inner join clase c on c.idcatedratico = d.idcatedratico inner join periodos p on p.idclase = c.idclase where c.idcarrera = {carrera} and c.fechainicio >= '{desde}' and c.fechafin <= '{hasta}' and month(p.fecha) = {j[0]} and year(p.fecha) = {i[0]} group by n.abreviatura, d.nombre, d.apellido order by n.abreviatura, d.nombre, d.apellido;"
+							cursor.execute(consulta)
+							print(consulta)
+							catedraticos = cursor.fetchall()
+							datacatedratico = []
+							for k in catedraticos:
+								consulta = f"select count(p.idperiodos) from clase c inner join periodos p on p.idclase = c.idclase where c.idcarrera = {carrera} and c.fechainicio >= '{desde}' and c.fechafin <= '{hasta}' and p.idestado = 2 and c.idcatedratico = {k[4]} and month(p.fecha) = {j[0]} and year(p.fecha) = {i[0]};"
+								cursor.execute(consulta)
+								catedratico = cursor.fetchone()
+								dif = int(k[3]) - int(catedratico[0])
+								aux = []
+								aux.append(k[0])
+								aux.append(k[1])
+								aux.append(k[2])
+								aux.append(k[3])
+								aux.append(catedratico[0])
+								aux.append(dif)
+								aux.append(j[1])
+								aux.append(i[0])
+								datacatedratico.append(aux)
+							datames.append(datacatedratico)
+						dataanios.append(datames)
+				print(dataanios)
+			finally:
+				conexion.close()
+		except (pymysql.err.OperationalError, pymysql.err.InternalError) as e:
+			print("Ocurrió un error al conectar: ", e)
+	return render_template('periodoscarrera.html', title="Periodos por Carrera", carreras=carreras, carrera=carrera, desde=desde, hasta=hasta, anios=anios, dataanios=dataanios, meses=meses)
+
 @app.route('/nuevacarrera', methods=['GET', 'POST'])
 def nuevacarrera():
 	if request.method == 'POST':
@@ -841,24 +905,36 @@ def montofact(id):
 				totales = 0
 				for i in anios:
 					for j in meses:
-						consulta = f'SELECT count(fecha) from periodos p inner join clase c on p.idclase = c.idclase where p.idestado = 2 and p.liquidado = 0 and c.idcatedratico = {id} and year(p.fecharegistro) = {i[0]} and month(p.fecharegistro) = {j[0]};'
+						consulta = f'select a.idcarrera, p.precio from carrera a inner join clase c on a.idcarrera = c.idcarrera inner join periodos p on p.idclase = c.idclase where c.idcatedratico = {id} and p.idestado = 2 and p.liquidado = 0 and year(p.fecharegistro) = {i[0]} and month(p.fecharegistro) = {j[0]} group by a.codigo, p.precio order by a.codigo asc, p.precio asc;'
 						cursor.execute(consulta)
-						num = cursor.fetchone()
-						consulta = f"SELECT c.nombre, c.horainicio, c.horafin, a.codigo, DATE_FORMAT(p.fecha,'%d/%m/%Y'), p.idperiodos, p.idestado, p.precio, c.seccion, DATE_FORMAT(p.fecharegistro,'%d/%m/%Y'), p.formadepago from clase c inner join carrera a on a.idcarrera = c.idcarrera inner join periodos p on p.idclase = c.idclase where p.idestado = 2 and p.liquidado = 0 and c.idcatedratico = {id} and year(p.fecharegistro) = {i[0]} and month(p.fecharegistro) = {j[0]} order by p.fecha;"
-						cursor.execute(consulta)
-						periodos = cursor.fetchall()
-						total = 0
-						for k in periodos:
-							total = total + float(k[7])
-						aux = []
-						if int(num[0]) > 0:
-							aux.append(i[0])
-							aux.append(j)
-							aux.append(num[0])
-							aux.append(periodos)
-							aux.append(total)
-							periodosmeses.append(aux)
-							totales = totales + total
+						carreras = cursor.fetchall()
+						for a in carreras:
+							consulta = f'SELECT count(fecha) from periodos p inner join clase c on p.idclase = c.idclase where p.idestado = 2 and p.liquidado = 0 and c.idcatedratico = {id} and year(p.fecharegistro) = {i[0]} and month(p.fecharegistro) = {j[0]} and c.idcarrera = {a[0]} and p.precio = {a[1]};'
+							cursor.execute(consulta)
+							num = cursor.fetchone()
+							consulta = f'SELECT count(fecha) from periodos p inner join clase c on p.idclase = c.idclase where p.liquidado = 0 and c.idcatedratico = {id} and c.idcarrera = {a[0]} and year(p.fecha) = {i[0]} and month(p.fecha) = {j[0]} and p.precio = {a[1]};'
+							cursor.execute(consulta)
+							num1 = cursor.fetchone()
+							dif = int(num1[0]) - int(num[0])
+							consulta = f"SELECT c.nombre, c.horainicio, c.horafin, a.codigo, DATE_FORMAT(p.fecha,'%d/%m/%Y'), p.idperiodos, p.idestado, p.precio, c.seccion, DATE_FORMAT(p.fecharegistro,'%d/%m/%Y'), p.formadepago from clase c inner join carrera a on a.idcarrera = c.idcarrera inner join periodos p on p.idclase = c.idclase where p.idestado = 2 and p.liquidado = 0 and c.idcatedratico = {id} and year(p.fecharegistro) = {i[0]} and month(p.fecharegistro) = {j[0]} and c.idcarrera = {a[0]} and p.precio = {a[1]} order by p.fecha;"
+							cursor.execute(consulta)
+							periodos = cursor.fetchall()
+							total = 0
+							for k in periodos:
+								total = total + float(k[7])
+							aux = []
+							if int(num[0]) > 0:
+								aux.append(i[0])
+								aux.append(j)
+								aux.append(num[0])
+								aux.append(periodos)
+								aux.append(total)
+								aux.append(periodos[0][3])
+								aux.append(num1[0])
+								aux.append(dif)
+								aux.append(a[1])
+								periodosmeses.append(aux)
+								totales = totales + total
 		finally:
 			conexion.close()
 	except (pymysql.err.OperationalError, pymysql.err.InternalError) as e:
@@ -874,7 +950,7 @@ def montofact(id):
 
 	#Save barcode as PNG
 	aux = f"static/barcodes/{catedratico[1]}_{catedratico[2]}"
-	my_barcode.save(aux)
+	#my_barcode.save(aux)
 	if request.method == 'POST':
 		for i in periodosmeses:
 			try:
@@ -1027,7 +1103,7 @@ def catedraticohistorico(id):
 
 	#Save barcode as PNG
 	aux = f"static/barcodes/{catedratico[1]}_{catedratico[2]}"
-	my_barcode.save(aux)
+	#my_barcode.save(aux)
 	if request.method == 'POST':
 		boton = request.form["varaux"]
 		desde = request.form["desde"]
@@ -1141,7 +1217,6 @@ def entradas():
 				conexion.close()
 		except (pymysql.err.OperationalError, pymysql.err.InternalError) as e:
 			print("Ocurrió un error al conectar: ", e)
-
 	return render_template('entradas.html', title="Entradas", entradas=entradas, desde = desde, hasta = hasta, catedratico = catedratico, catedraticos = catedraticos)
 
 if __name__ == '__main__':
