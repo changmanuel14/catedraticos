@@ -567,20 +567,20 @@ def periodoscarrera():
 			conexion = pymysql.connect(host=Conhost, user=Conuser, password=Conpassword, db=Condb)
 			try:
 				with conexion.cursor() as cursor:
-					consulta = "SELECT year(p.fecha) from periodos p inner join clase c on c.idclase = p.idclase where c.idcarrera = %s and c.fechainicio >= %s and c.fechafin <= %s group by year(p.fecha) order by year(p.fecha) asc;"
+					consulta = "SELECT year(p.fecha) from periodos p inner join clase c on c.idclase = p.idclase where c.idcarrera = %s and p.fecha >= %s and p.fecha <= %s group by year(p.fecha) order by year(p.fecha) asc;"
 					cursor.execute(consulta, (carrera, desde, hasta))
 					anios = cursor.fetchall()
 					dataanios = []
 					for i in anios:
 						datames  = []
 						for j in meses:
-							consulta = f"select n.abreviatura, d.nombre, d.apellido, count(p.idperiodos), d.idcatedratico from catedratico d inner join nivelacademico n on n.idnivelacademico = d.idnivelacademico inner join clase c on c.idcatedratico = d.idcatedratico inner join periodos p on p.idclase = c.idclase where c.idcarrera = {carrera} and c.fechainicio >= '{desde}' and c.fechafin <= '{hasta}' and month(p.fecha) = {j[0]} and year(p.fecha) = {i[0]} group by n.abreviatura, d.nombre, d.apellido order by n.abreviatura, d.nombre, d.apellido;"
+							consulta = f"select n.abreviatura, d.nombre, d.apellido, count(p.idperiodos), d.idcatedratico from catedratico d inner join nivelacademico n on n.idnivelacademico = d.idnivelacademico inner join clase c on c.idcatedratico = d.idcatedratico inner join periodos p on p.idclase = c.idclase where c.idcarrera = {carrera} and p.fecha >= '{desde}' and p.fecha <= '{hasta}' and month(p.fecha) = {j[0]} and year(p.fecha) = {i[0]} group by n.abreviatura, d.nombre, d.apellido order by n.abreviatura, d.nombre, d.apellido;"
 							cursor.execute(consulta)
 							print(consulta)
 							catedraticos = cursor.fetchall()
 							datacatedratico = []
 							for k in catedraticos:
-								consulta = f"select count(p.idperiodos) from clase c inner join periodos p on p.idclase = c.idclase where c.idcarrera = {carrera} and c.fechainicio >= '{desde}' and c.fechafin <= '{hasta}' and p.idestado = 2 and c.idcatedratico = {k[4]} and month(p.fecha) = {j[0]} and year(p.fecha) = {i[0]};"
+								consulta = f"select count(p.idperiodos) from clase c inner join periodos p on p.idclase = c.idclase where c.idcarrera = {carrera} and p.fecha >= '{desde}' and p.fecha <= '{hasta}' and p.idestado = 2 and c.idcatedratico = {k[4]} and month(p.fecha) = {j[0]} and year(p.fecha) = {i[0]};"
 								cursor.execute(consulta)
 								catedratico = cursor.fetchone()
 								dif = int(k[3]) - int(catedratico[0])
