@@ -307,11 +307,8 @@ def nuevaclase():
 					arrfechafin = str(fechafin).split('-')
 					newfechainicio = datetime.date(int(arrfechainicio[0]), int(arrfechainicio[1]), int(arrfechainicio[2]))
 					newfechafin = datetime.date(int(arrfechafin[0]), int(arrfechafin[1]), int(arrfechafin[2]))
-					print(dia)
 					while int(newfechainicio.weekday()) != int(dia):
-						print(newfechainicio.weekday())
 						newfechainicio += datetime.timedelta(days=1)
-						print(newfechainicio)
 					if int(newfechainicio.weekday()) == int(dia):
 						aux = newfechainicio
 						while aux <= newfechafin:
@@ -387,13 +384,8 @@ def editarclase(id):
 						arrfechafin = str(fechafin).split('-')
 						newfechainicio = datetime.date.today()
 						newfechafin = datetime.date(int(arrfechafin[0]), int(arrfechafin[1]), int(arrfechafin[2]))
-						print(newfechainicio.weekday())
-						print(dia)
-						print(int(newfechainicio.weekday()) != int(dia))
 						while int(newfechainicio.weekday()) != int(dia):
-							print(newfechainicio.weekday())
 							newfechainicio += datetime.timedelta(days=1)
-							print(newfechainicio)
 						if int(newfechainicio.weekday()) == int(dia):
 							aux = newfechainicio
 							while aux <= newfechafin:
@@ -576,7 +568,6 @@ def periodoscarrera():
 						for j in meses:
 							consulta = f"select n.abreviatura, d.nombre, d.apellido, count(p.idperiodos), d.idcatedratico from catedratico d inner join nivelacademico n on n.idnivelacademico = d.idnivelacademico inner join clase c on c.idcatedratico = d.idcatedratico inner join periodos p on p.idclase = c.idclase where c.idcarrera = {carrera} and p.fecha >= '{desde}' and p.fecha <= '{hasta}' and month(p.fecha) = {j[0]} and year(p.fecha) = {i[0]} group by n.abreviatura, d.nombre, d.apellido order by n.abreviatura, d.nombre, d.apellido;"
 							cursor.execute(consulta)
-							print(consulta)
 							catedraticos = cursor.fetchall()
 							datacatedratico = []
 							for k in catedraticos:
@@ -596,7 +587,6 @@ def periodoscarrera():
 								datacatedratico.append(aux)
 							datames.append(datacatedratico)
 						dataanios.append(datames)
-				print(dataanios)
 			finally:
 				conexion.close()
 		except (pymysql.err.OperationalError, pymysql.err.InternalError) as e:
@@ -728,7 +718,6 @@ def montofacturar():
 					total = cursor.fetchone()
 					consulta = f"SELECT sum(p.precio) from periodos p inner join clase c on c.idclase = p.idclase where c.idcatedratico = {i[0]} and p.formadepago = '{i[4]}' and p.idestado = 2 and p.liquidado = 0 and p.fecharegistro <= LAST_DAY(DATE_SUB(CURDATE(), INTERVAL 1 MONTH)) and p.fecharegistro > LAST_DAY(DATE_SUB(CURDATE(), INTERVAL 2 MONTH));"
 					cursor.execute(consulta)
-					print(consulta)
 					totalmes = cursor.fetchone()
 					try:
 						totalmes = float(totalmes[0])
@@ -764,7 +753,6 @@ def montofacturarpdf():
 					total = cursor.fetchone()
 					consulta = f"SELECT sum(p.precio) from periodos p inner join clase c on c.idclase = p.idclase where c.idcatedratico = {i[0]} and p.formadepago = '{i[4]}' and p.idestado = 2 and p.liquidado = 0 and p.fecharegistro <= LAST_DAY(DATE_SUB(CURDATE(), INTERVAL 1 MONTH)) and p.fecharegistro > LAST_DAY(DATE_SUB(CURDATE(), INTERVAL 2 MONTH));"
 					cursor.execute(consulta)
-					print(consulta)
 					totalmes = cursor.fetchone()
 					try:
 						totalmes = float(totalmes[0])
@@ -801,7 +789,6 @@ def montofacturarexcel():
 					total = cursor.fetchone()
 					consulta = f"SELECT sum(p.precio) from periodos p inner join clase c on c.idclase = p.idclase where c.idcatedratico = {i[0]} and p.formadepago = '{i[4]}' and p.idestado = 2 and p.liquidado = 0 and p.fecharegistro <= LAST_DAY(DATE_SUB(CURDATE(), INTERVAL 1 MONTH)) and p.fecharegistro > LAST_DAY(DATE_SUB(CURDATE(), INTERVAL 2 MONTH));"
 					cursor.execute(consulta)
-					print(consulta)
 					totalmes = cursor.fetchone()
 					try:
 						totalmes = float(totalmes[0])
@@ -972,7 +959,6 @@ def montofact(id):
 									consulta = f"UPDATE periodos set liquidado = 1, factura = '{auxfacturai}' where idperiodos = {j[5]}"
 									cursor.execute(consulta)
 								conexion.commit()
-						print(aux)
 				finally:
 					conexion.close()
 			except (pymysql.err.OperationalError, pymysql.err.InternalError) as e:
@@ -1034,7 +1020,6 @@ def reportepdf(id):
 					cursor.execute(consulta, (id,i+1,i+1, anio, anio, i+1, i+2, anio, anio, i+1, anio, i+1, anio, i+1, anio, i+1, anio))
 					num = cursor.fetchone()
 					consulta = "SELECT c.nombre, c.horainicio, c.horafin, a.codigo, DATE_FORMAT(p.fecha,'%d/%m/%Y'), p.idperiodos, p.idestado, p.precio, c.seccion, DATE_FORMAT(p.fecharegistro,'%d/%m/%Y'), p.formadepago from clase c inner join carrera a on a.idcarrera = c.idcarrera inner join periodos p on p.idclase = c.idclase where c.idcatedratico = " + str(id) + " and p.idestado = 2 and p.liquidado = 0 and ((month(p.fecha) = " + str(i+1) + " and month(p.fecharegistro) = " + str(i+1) + " and year(p.fecha) = " + str(anio) + " and year(p.fecharegistro) = " + str(anio) + ") or (month(p.fecha) < " + str(i+1) + " and month(p.fecharegistro) = " + str(i+2) + " and day(p.fecharegistro) < 5 and year(p.fecha) = " + str(anio) + " and year(p.fecharegistro) = " + str(anio) + ") or (month(p.fecha) <> " + str(i+1) + " and year(p.fecha) < " + str(anio) + " and month(p.fecharegistro) = " + str(i+1) + " and year(p.fecharegistro) = " + str(anio) + ") or (month(p.fecha) < " + str(i+1) + " and year(p.fecha) = " + str(anio) + " and month(p.fecharegistro) = " + str(i+1) + " and day(p.fecharegistro) >= 5 and year(p.fecharegistro) = " + str(anio) + ")) order by p.fecha"
-					print(consulta)
 					cursor.execute(consulta)
 					periodos = cursor.fetchall()
 					total = 0
