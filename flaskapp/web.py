@@ -690,7 +690,9 @@ def registroper(id):
 						estado = request.form[aux]
 						aux = f"fecharegistro{i[0]}"
 						fecharegistro = request.form[aux]
-						consulta = f"UPDATE periodos set idestado = {estado}, fecharegistro = '{fecharegistro}' where idperiodos = {i[0]}"
+						aux = f"comentario{i[0]}"
+						comentario = request.form[aux]
+						consulta = f"UPDATE periodos set idestado = {estado}, fecharegistro = '{fecharegistro}', comentario = '{comentario}' where idperiodos = {i[0]}"
 						cursor.execute(consulta)
 				conexion.commit()
 			finally:
@@ -903,7 +905,7 @@ def montofact(id):
 							cursor.execute(consulta)
 							num1 = cursor.fetchone()
 							dif = int(num1[0]) - int(num[0])
-							consulta = f"SELECT c.nombre, c.horainicio, c.horafin, a.codigo, DATE_FORMAT(p.fecha,'%d/%m/%Y'), p.idperiodos, p.idestado, p.precio, c.seccion, DATE_FORMAT(p.fecharegistro,'%d/%m/%Y'), p.formadepago from clase c inner join carrera a on a.idcarrera = c.idcarrera inner join periodos p on p.idclase = c.idclase where p.idestado = 2 and p.liquidado = 0 and c.idcatedratico = {id} and year(p.fecharegistro) = {i[0]} and month(p.fecharegistro) = {j[0]} and c.idcarrera = {a[0]} and p.precio = {a[1]} order by p.fecha;"
+							consulta = f"SELECT c.nombre, c.horainicio, c.horafin, a.codigo, DATE_FORMAT(p.fecha,'%d/%m/%Y'), p.idperiodos, p.idestado, p.precio, c.seccion, DATE_FORMAT(p.fecharegistro,'%d/%m/%Y'), p.formadepago, p.comentario from clase c inner join carrera a on a.idcarrera = c.idcarrera inner join periodos p on p.idclase = c.idclase where p.idestado = 2 and p.liquidado = 0 and c.idcatedratico = {id} and year(p.fecharegistro) = {i[0]} and month(p.fecharegistro) = {j[0]} and c.idcarrera = {a[0]} and p.precio = {a[1]} order by p.fecha;"
 							cursor.execute(consulta)
 							periodos = cursor.fetchall()
 							total = 0
@@ -1088,7 +1090,7 @@ def catedraticohistorico(id):
 
 	#Save barcode as PNG
 	aux = f"static/barcodes/{catedratico[1]}_{catedratico[2]}"
-	#my_barcode.save(aux)
+	my_barcode.save(aux)
 	if request.method == 'POST':
 		boton = request.form["varaux"]
 		desde = request.form["desde"]
@@ -1099,7 +1101,7 @@ def catedraticohistorico(id):
 				conexion = pymysql.connect(host=Conhost, user=Conuser, password=Conpassword, db=Condb)
 				try:
 					with conexion.cursor() as cursor:
-						consulta = f"""SELECT c.nombre, DATE_FORMAT(p.fecha,'%d/%m/%Y'), c.horainicio, c.horafin, a.codigo, c.seccion, p.precio, p.idestado, p.liquidado, p.factura, p.cheque, p.idperiodos, p.formadepago,DATE_FORMAT(p.fecharegistro,'%d/%m/%Y')
+						consulta = f"""SELECT c.nombre, DATE_FORMAT(p.fecha,'%d/%m/%Y'), c.horainicio, c.horafin, a.codigo, c.seccion, p.precio, p.idestado, p.liquidado, p.factura, p.cheque, p.idperiodos, p.formadepago,DATE_FORMAT(p.fecharegistro,'%d/%m/%Y'), p.comentario
 						from clase c inner join periodos p on c.idclase = p.idclase inner join carrera a on a.idcarrera = c.idcarrera inner join estado e on e.idestado = p.idestado
 						where p.fecha >= '{desde}' and p.fecha <= '{hasta}'"""
 						if len(curso) > 0:

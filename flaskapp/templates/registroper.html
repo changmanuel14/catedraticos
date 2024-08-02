@@ -14,7 +14,7 @@
 <br><br><br><br><br><br><br><br>
 
 <form action="" method="POST">
-	<table class="table table-striped sortable">
+	<table class="table table-striped sortable" style="font-size: small;">
 		<tr>
 			<th>Nombre</th>
 			<th>Fecha</th>
@@ -25,70 +25,80 @@
 			<th>Modalidad</th>
 			<th>Estado</th>
 			<th>Fecha Registro</th>
+			<th>Comentario</th>
 		</tr>
-{% for i in meses %}
-{% if periodosmeses[i[0]-1][1] > 0 %}
-	<tr>
-		<th colspan="9"><center>{{i[1]}}</center></th>
-	</tr>
-	{% for j in periodosmeses[i[0]-1][2] %}
-	<tr>
-		<td>{{j[0]}}</td>
-		<td>{{j[4]}}</td>
-		<td>{{j[1]}}</td>
-		<td>{{j[2]}}</td>
-		<td>{{j[3]}}</td>
-		<td>{{j[7]}}</td>
-		<td>
-			{% if j[8] == 0 %}
-			Virtual
-			{% elif j[8] == 1 %}
-			Presencial
-			{% endif %}
-		</td>
-		<td>
-			<div class="form-group col-md-12">
-				<select name="estado{{j[5]}}" id="estado{{j[5]}}" class="form-control" onchange="contar()">
-				  {% for k in estados %}
-				  {% if j[6] == k[0] %}
-				  <option value="{{k[0]}}" selected>{{k[1]}}</option>
-				  {% else %}
-				  <option value="{{k[0]}}">{{k[1]}}</option>
-				  {% endif %}
-				  {% endfor %}
-				</select>
-			  </div>
-		</td>
-		<td>
-		    <div class="form-group col-md-12">
-				<input type="date" class="form-control" id="fecharegistro{{j[5]}}" name="fecharegistro{{j[5]}}" value="{{hoy}}">
-			  </div>
-		</td>
-	</tr>
-	{% endfor %}
+		{% for i in meses %}
+		{% if periodosmeses[i[0]-1][1] > 0 %}
+		<tr>
+			<th colspan="10">
+				<center>{{i[1]}}</center>
+			</th>
+		</tr>
+		{% for j in periodosmeses[i[0]-1][2] %}
+		<tr>
+			<td>{{j[0]}}</td>
+			<td>{{j[4]}}</td>
+			<td>{{j[1]}}</td>
+			<td>{{j[2]}}</td>
+			<td>{{j[3]}}</td>
+			<td>{{j[7]}}</td>
+			<td>
+				{% if j[8] == 0 %}
+				Virtual
+				{% elif j[8] == 1 %}
+				Presencial
+				{% endif %}
+			</td>
+			<td>
+				<div class="form-group col-md-12">
+					<select name="estado{{j[5]}}" id="estado{{j[5]}}" class="form-control" onchange="contar()">
+						{% for k in estados %}
+						{% if j[6] == k[0] %}
+						<option value="{{k[0]}}" selected>{{k[1]}}</option>
+						{% else %}
+						<option value="{{k[0]}}">{{k[1]}}</option>
+						{% endif %}
+						{% endfor %}
+					</select>
+				</div>
+			</td>
+			<td>
+				<div class="form-group col-md-12">
+					<input type="date" class="form-control" id="fecharegistro{{j[5]}}" name="fecharegistro{{j[5]}}"
+						value="{{hoy}}">
+				</div>
+			</td>
+			<td>
+				<div class="form-group col-md-12">
+					<input type="tect" class="form-control" id="comentario{{j[5]}}" name="comentario{{j[5]}}"
+						placeholder="Comentario">
+				</div>
+			</td>
+		</tr>
+		{% endfor %}
 
-{% endif %}
-{% endfor %}
-</table>
-<h4 id="conteo">Periodos Registrados: 0</h4>
-<button type="submit" class="btn btn-primary">Aceptar</button>
+		{% endif %}
+		{% endfor %}
+	</table>
+	<h4 id="conteo">Periodos Registrados: 0</h4>
+	<button type="submit" class="btn btn-primary">Aceptar</button>
 </form>
 
 <script type="text/javascript">
-	function contar(){
-		var arreglo = {{ validar|tojson|safe }};
-		var cont = 0
-		var etiqueta = document.getElementById('conteo')
-		for(var i = 0; i<arreglo.length;i++){
-			var aux = 'estado' + String(arreglo[i][0])
-			if(document.getElementById(aux).value == 2){
-				cont++;
-			}
+	function contar() {
+		var arreglo = {{ validar| tojson | safe }};
+	var cont = 0
+	var etiqueta = document.getElementById('conteo')
+	for (var i = 0; i < arreglo.length; i++) {
+		var aux = 'estado' + String(arreglo[i][0])
+		if (document.getElementById(aux).value == 2) {
+			cont++;
 		}
-		etiqueta.innerHTML = 'Periodos Registrados: ' + String(cont)
+	}
+	etiqueta.innerHTML = 'Periodos Registrados: ' + String(cont)
 	  }
 
-  </script>
+</script>
 
 
 
