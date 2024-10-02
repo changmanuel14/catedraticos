@@ -11,12 +11,11 @@ from conexion import Conhost, Conuser, Conpassword, Condb
 
 app = Flask(__name__)
 app.secret_key = 'd589d3d0d15d764ed0a98ff5a37af547'
-PATH_FILE = path.join(path.dirname(__file__), 'flaskapp')
+PATH_FILE = path.dirname(__file__)
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
 	mensaje = ""
-	print(PATH_FILE)
 	if request.method == 'POST':
 		codigo = request.form["codigo"]
 		if '012023' in codigo:
@@ -182,8 +181,7 @@ def editarcatedratico(id):
 	my_barcode = barcode_format(number, writer=ImageWriter())
 
 	#Save barcode as PNG
-	aux = f"static/barcodes/{catedratico[0]}_{catedratico[1]}"
-	my_barcode.save(aux)
+	my_barcode.save(path.join(PATH_FILE, 'static', 'barcodes', f"{catedratico[0]}_{catedratico[1]}"))
 
 
 	if request.method == 'POST':
@@ -506,8 +504,7 @@ def periodoscat(id):
 	my_barcode = barcode_format(number, writer=ImageWriter())
 
 	#Save barcode as PNG
-	aux = f"static/barcodes/{catedratico[1]}_{catedratico[2]}"
-	my_barcode.save(aux)
+	my_barcode.save(path.join(PATH_FILE, 'static', 'barcodes', f"{catedratico[1]}_{catedratico[2]}"))
 	return render_template('periodoscat.html', title="Periodos por Catedrático", catedratico=catedratico, clases = clases, clasesdias = clasesdias, dias=dias)
 
 @app.route('/periodoscatpdf/<id>', methods=['GET', 'POST'])
@@ -683,8 +680,7 @@ def registroper(id):
 	my_barcode = barcode_format(number, writer=ImageWriter())
 
 	#Save barcode as PNG
-	aux = f"static/barcodes/{catedratico[1]}_{catedratico[2]}"
-	my_barcode.save(aux)
+	my_barcode.save(path.join(PATH_FILE, 'static', 'barcodes', f"{catedratico[1]}_{catedratico[2]}"))
 	if request.method == 'POST':
 		try:
 			conexion = pymysql.connect(host=Conhost, user=Conuser, password=Conpassword, db=Condb)
@@ -947,8 +943,7 @@ def montofact(id):
 	my_barcode = barcode_format(number, writer=ImageWriter())
 
 	#Save barcode as PNG
-	aux = f"static/barcodes/{catedratico[1]}_{catedratico[2]}"
-	#my_barcode.save(aux)
+	my_barcode.save(path.join(PATH_FILE, 'static', 'barcodes', f"{catedratico[1]}_{catedratico[2]}"))
 	if request.method == 'POST':
 		for i in periodosmeses:
 			try:
