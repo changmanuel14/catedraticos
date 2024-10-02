@@ -81,37 +81,13 @@
 			<label for="formadepago">Forma de Pago</label>
 			<select id="formadepago" name="formadepago" class="form-control" required>
 				<option selected>Seleccione la forma de pago</option>
-				{% if periodo[8] == 'Cheque' %}
-				<option value="Cheque" selected>Cheque</option>
-				<option value="Efectivo">Efectivo</option>
-				<option value="Cheque - Auxiliar de Enfermeria">Cheque - Auxiliar de Enfermeria</option>
-				<option value="Cheque - Incluye Impuesto">Cheque - Incluye Impuesto</option>
-				<option value="Cheque - Technical Training Academy">Cheque - Technical Training Academy</option>
-				{% elif periodo[8] == 'Efectivo' %}
-				<option value="Cheque">Cheque</option>
-				<option value="Efectivo" selected>Efectivo</option>
-				<option value="Cheque - Auxiliar de Enfermeria">Cheque - Auxiliar de Enfermeria</option>
-				<option value="Cheque - Incluye Impuesto">Cheque - Incluye Impuesto</option>
-				<option value="Cheque - Technical Training Academy">Cheque - Technical Training Academy</option>
-				{% elif periodo[8] == 'Cheque - Auxiliar de Enfermeria' %}
-				<option value="Cheque">Cheque</option>
-				<option value="Efectivo">Efectivo</option>
-				<option value="Cheque - Auxiliar de Enfermeria" selected>Cheque - Auxiliar de Enfermeria</option>
-				<option value="Cheque - Incluye Impuesto">Cheque - Incluye Impuesto</option>
-				<option value="Cheque - Technical Training Academy">Cheque - Technical Training Academy</option>
-				{% elif periodo[8] == 'Cheque - Incluye Impuesto' %}
-				<option value="Cheque">Cheque</option>
-				<option value="Efectivo">Efectivo</option>
-				<option value="Cheque - Auxiliar de Enfermeria">Cheque - Auxiliar de Enfermeria</option>
-				<option value="Cheque - Incluye Impuesto" selected>Cheque - Incluye Impuesto</option>
-				<option value="Cheque - Technical Training Academy">Cheque - Technical Training Academy</option>
-				{% elif periodo[8] == 'Cheque - Technical Training Academy' %}
-				<option value="Cheque">Cheque</option>
-				<option value="Efectivo">Efectivo</option>
-				<option value="Cheque - Auxiliar de Enfermeria">Cheque - Auxiliar de Enfermeria</option>
-				<option value="Cheque - Incluye Impuesto">Cheque - Incluye Impuesto</option>
-				<option value="Cheque - Technical Training Academy" selected>Cheque - Technical Training Academy</option>
+				{% for i in metodospagos %}
+				{% if periodo[8] == i[0] %}
+				<option value="{{i[0]}}" selected>{{i[0]}}</option>
+				{% else %}
+				<option value="{{i[0]}}">{{i[0]}}</option>
 				{% endif %}
+				{% endfor %}
 			</select>
 		</div>
 	</div>

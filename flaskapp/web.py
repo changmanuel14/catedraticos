@@ -1,4 +1,5 @@
 from flask import Flask, Response, render_template, request, url_for, redirect
+from os import path
 import pymysql
 import datetime
 import io
@@ -10,10 +11,12 @@ from conexion import Conhost, Conuser, Conpassword, Condb
 
 app = Flask(__name__)
 app.secret_key = 'd589d3d0d15d764ed0a98ff5a37af547'
+PATH_FILE = path.join(path.dirname(__file__), 'flaskapp')
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
 	mensaje = ""
+	print(PATH_FILE)
 	if request.method == 'POST':
 		codigo = request.form["codigo"]
 		if '012023' in codigo:
@@ -277,6 +280,9 @@ def nuevaclase():
 				cursor.execute("SELECT c.idcatedratico, c.nombre, c.apellido, n.abreviatura from catedratico c inner join nivelacademico n on c.idnivelacademico = n.idnivelacademico order by n.abreviatura, c.nombre;")
 			# Con fetchall traemos todas las filas
 				catedraticos = cursor.fetchall()
+				cursor.execute("SELECT metodopago from metodopago order by idmetodopago;")
+			# Con fetchall traemos todas las filas
+				metodospagos = cursor.fetchall()
 		finally:
 			conexion.close()
 	except (pymysql.err.OperationalError, pymysql.err.InternalError) as e:
@@ -328,7 +334,7 @@ def nuevaclase():
 		except (pymysql.err.OperationalError, pymysql.err.InternalError) as e:
 			print("Ocurrió un error al conectar: ", e)
 		return redirect(url_for('periodos'))
-	return render_template('nuevaclase.html', title="Nuevo Periodo", carreras = carreras, dias=dias, catedraticos=catedraticos)
+	return render_template('nuevaclase.html', title="Nuevo Periodo", carreras = carreras, dias=dias, catedraticos=catedraticos, metodospagos=metodospagos)
 
 @app.route('/editarclase/<id>', methods=['GET', 'POST'])
 def editarclase(id):
@@ -338,6 +344,9 @@ def editarclase(id):
 		conexion = pymysql.connect(host=Conhost, user=Conuser, password=Conpassword, db=Condb)
 		try:
 			with conexion.cursor() as cursor:
+				cursor.execute("SELECT metodopago from metodopago order by idmetodopago;")
+			# Con fetchall traemos todas las filas
+				metodospagos = cursor.fetchall()
 				cursor.execute("SELECT idcarrera, nombre, codigo from carrera order by codigo;")
 			# Con fetchall traemos todas las filas
 				carreras = cursor.fetchall()
@@ -399,7 +408,7 @@ def editarclase(id):
 		except (pymysql.err.OperationalError, pymysql.err.InternalError) as e:
 			print("Ocurrió un error al conectar: ", e)
 		return redirect(url_for('periodoscat', id = catedraticos[0]))
-	return render_template('editarclase.html', title="Editar Periodo", carreras = carreras, dias=dias, catedraticos = catedraticos, periodo=periodo, horas = horas,idclase=id)
+	return render_template('editarclase.html', title="Editar Periodo", carreras = carreras, dias=dias, catedraticos = catedraticos, periodo=periodo, horas = horas,idclase=id, metodospagos=metodospagos)
 
 @app.route('/periodosclase', methods=['GET', 'POST'])
 def periodosclase():

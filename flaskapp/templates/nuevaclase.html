@@ -85,11 +85,9 @@
 			<label for="formadepago">Forma de Pago</label>
 			<select id="formadepago" name="formadepago" class="form-control" required>
 				<option selected>Seleccione la forma de pago</option>
-				<option value="Cheque">Cheque</option>
-				<option value="Efectivo">Efectivo</option>
-				<option value="Cheque - Auxiliar de Enfermeria">Cheque - Auxiliar de Enfermeria</option>
-				<option value="Cheque - Incluye Impuesto">Cheque - Incluye Impuesto</option>
-				<option value="Cheque - Technical Training Academy">Cheque - Technical Training Academy</option>
+				{% for i in metodospagos %}
+				<option value="{{i[0]}}">{{i[0]}}</option>
+				{% endfor %}
 			</select>
 		</div>
 	</div>
