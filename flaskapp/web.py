@@ -458,6 +458,7 @@ def periodoscatedratico():
 		try:
 			with conexion.cursor() as cursor:
 				consulta = f"SELECT c.idcatedratico, c.nombre, c.apellido, n.abreviatura from catedratico c inner join nivelacademico n on c.idnivelacademico = n.idnivelacademico inner join clase l on l.idcatedratico = c.idcatedratico where l.fechafin >= '{str(hoy)}' group by c.idcatedratico, c.nombre, c.apellido, n.abreviatura order by n.abreviatura, c.nombre;"
+				print(consulta)
 				cursor.execute(consulta)
 			# Con fetchall traemos todas las filas
 				catedraticos = cursor.fetchall()
