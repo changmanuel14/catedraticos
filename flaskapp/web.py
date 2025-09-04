@@ -342,7 +342,7 @@ def editarclase(id):
 		conexion = pymysql.connect(host=Conhost, user=Conuser, password=Conpassword, db=Condb)
 		try:
 			with conexion.cursor() as cursor:
-				cursor.execute("SELECT metodopago from metodopago order by idmetodopago;")
+				cursor.execute("SELECT metodopago from metodopago order by metodopago;")
 			# Con fetchall traemos todas las filas
 				metodospagos = cursor.fetchall()
 				cursor.execute("SELECT idcarrera, nombre, codigo from carrera order by codigo;")
