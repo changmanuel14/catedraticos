@@ -278,7 +278,7 @@ def nuevaclase():
 				cursor.execute("SELECT c.idcatedratico, c.nombre, c.apellido, n.abreviatura from catedratico c inner join nivelacademico n on c.idnivelacademico = n.idnivelacademico order by n.abreviatura, c.nombre;")
 			# Con fetchall traemos todas las filas
 				catedraticos = cursor.fetchall()
-				cursor.execute("SELECT metodopago from metodopago order by idmetodopago;")
+				cursor.execute("SELECT metodopago from metodopago order by metodopago;")
 			# Con fetchall traemos todas las filas
 				metodospagos = cursor.fetchall()
 		finally:
