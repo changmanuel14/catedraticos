@@ -3,105 +3,152 @@
 
 <h1>Nuevo Periodo</h1>
 
+<!-- Mensaje de error -->
+{% if error %}
+<div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <h4 class="alert-heading">Conflicto de Horario Detectado</h4>
+    {{ error|safe }}
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+{% endif %}
+
 <form action="" method="POST">
-	<div class="form-row">
-		<div class="form-group col-md-6">
-			<label for="nombre">Curso</label>
-			<input type="text" class="form-control" id="curso" name="curso" placeholder="Curso" required>
-		</div>
-		<div class="form-group col-md-6">
-			<label for="carrera">Carrera</label>
-			<select id="carrera" name="carrera" class="form-control" required>
-				<option selected>Seleccione la carrera</option>
-				{% for i in carreras %}
-				<option value="{{i[0]}}">{{i[1]}}</option>
-				{% endfor %}
-			</select>
-		</div>
-	</div>
-	<div class="form-row">
-		<div class="form-group col-md-6">
-			<label for="fechainicio">Fecha Inicio</label>
-			<input type="date" class="form-control" id="fechainicio" name="fechainicio" placeholder="Fecha Inicio"
-				required>
-		</div>
-		<div class="form-group col-md-6">
-			<label for="fechafin">Fecha Fin</label>
-			<input type="date" class="form-control" id="fechafin" name="fechafin" placeholder="Fecha Fin" required>
-		</div>
-	</div>
-	<div class="form-row">
-		<div class="form-group col-md-6">
-			<label for="horainicio">Hora Inicio</label>
-			<input type="time" class="form-control" id="horainicio" name="horainicio" placeholder="Hora Inicio"
-				required>
-		</div>
-		<div class="form-group col-md-6">
-			<label for="horafin">Hora Fin</label>
-			<input type="time" class="form-control" id="horafin" name="horafin" placeholder="Hora Fin" required>
-		</div>
-	</div>
-	<div class="form-row">
-		<div class="form-group col-md-6">
-			<label for="seccion">Sección</label>
-			<input type="text" class="form-control" id="seccion" name="seccion" placeholder="Sección" required>
-		</div>
-		<div class="form-group col-md-6">
-			<label for="precio">Precio</label>
-			<input type="number" step="0.01" class="form-control" id="precio" name="precio" placeholder="Precio"
-				required>
-		</div>
-	</div>
-	<div class="form-row">
-		<div class="form-group col-md-6">
-			<label for="dia">Dia</label>
-			<select id="dia" name="dia" class="form-control" required>
-				<option selected>Seleccione el dia de clase</option>
-				{% for i in dias %}
-				<option value="{{i[0]}}">{{i[1]}}</option>
-				{% endfor %}
-			</select>
-		</div>
-		<div class="form-group col-md-6">
-			<label for="catedratico">Catedratico</label>
-			<select id="catedratico" name="catedratico" class="form-control" required>
-				<option selected>Seleccione el catedrático</option>
-				{% for i in catedraticos %}
-				<option value="{{i[0]}}">{{i[3]}} {{i[1]}} {{i[2]}}</option>
-				{% endfor %}
-			</select>
-		</div>
-	</div>
-	<div class="form-row">
-		<div class="form-group col-md-6">
-			<label for="modalidad">Modalidad</label>
-			<select id="modalidad" name="modalidad" class="form-control" required>
-				<option selected>Seleccione la modalidad de clase</option>
-				<option value="0">Virtual</option>
-				<option value="1">Presencial</option>
-			</select>
-		</div>
-		<div class="form-group col-md-6">
-			<label for="formadepago">Forma de Pago</label>
-			<select id="formadepago" name="formadepago" class="form-control" required>
-				<option selected>Seleccione la forma de pago</option>
-				{% for i in metodospagos %}
-				<option value="{{i[0]}}">{{i[0]}}</option>
-				{% endfor %}
-			</select>
-		</div>
-	</div>
-	<div class="form-row">
-		<div class="form-group col-md-12">
-			<label for="plan">Plan</label>
-			<select id="plan" name="plan" class="form-control" required>
-				<option selected>Seleccione plan de estudio</option>
-				<option value="Semanal">Semanal</option>
-				<option value="Quincenal">Quincenal</option>
-			</select>
-		</div>
-	</div>
-	<button type="submit" class="btn btn-primary">Aceptar</button>
+    <div class="form-row">
+        <div class="form-group col-md-6">
+            <label for="nombre">Curso</label>
+            <input type="text" class="form-control" id="curso" name="curso" placeholder="Curso" required>
+        </div>
+        <div class="form-group col-md-6">
+            <label for="carrera">Carrera</label>
+            <select id="carrera" name="carrera" class="form-control" required>
+                <option selected>Seleccione la carrera</option>
+                {% for i in carreras %}
+                <option value="{{i[0]}}">{{i[1]}}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+    <div class="form-row">
+        <div class="form-group col-md-6">
+            <label for="fechainicio">Fecha Inicio</label>
+            <input type="date" class="form-control" id="fechainicio" name="fechainicio" placeholder="Fecha Inicio" required>
+        </div>
+        <div class="form-group col-md-6">
+            <label for="fechafin">Fecha Fin</label>
+            <input type="date" class="form-control" id="fechafin" name="fechafin" placeholder="Fecha Fin" required>
+        </div>
+    </div>
+    <div class="form-row">
+        <div class="form-group col-md-6">
+            <label for="horainicio">Hora Inicio</label>
+            <input type="time" class="form-control" id="horainicio" name="horainicio" placeholder="Hora Inicio" required>
+        </div>
+        <div class="form-group col-md-6">
+            <label for="horafin">Hora Fin</label>
+            <input type="time" class="form-control" id="horafin" name="horafin" placeholder="Hora Fin" required>
+        </div>
+    </div>
+    <div class="form-row">
+        <div class="form-group col-md-6">
+            <label for="seccion">Sección</label>
+            <input type="text" class="form-control" id="seccion" name="seccion" placeholder="Sección" required>
+        </div>
+        <div class="form-group col-md-6">
+            <label for="precio">Precio</label>
+            <input type="number" step="0.01" class="form-control" id="precio" name="precio" placeholder="Precio" required>
+        </div>
+    </div>
+    <div class="form-row">
+        <div class="form-group col-md-6">
+            <label for="dia">Dia</label>
+            <select id="dia" name="dia" class="form-control" required>
+                <option selected>Seleccione el dia de clase</option>
+                {% for i in dias %}
+                <option value="{{i[0]}}">{{i[1]}}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group col-md-6">
+            <label for="catedratico">Catedratico</label>
+            <select id="catedratico" name="catedratico" class="form-control" required>
+                <option selected>Seleccione el catedrático</option>
+                {% for i in catedraticos %}
+                <option value="{{i[0]}}">{{i[3]}} {{i[1]}} {{i[2]}}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+    <div class="form-row">
+        <div class="form-group col-md-6">
+            <label for="modalidad">Modalidad</label>
+            <select id="modalidad" name="modalidad" class="form-control" required>
+                <option selected>Seleccione la modalidad de clase</option>
+                <option value="0">Virtual</option>
+                <option value="1">Presencial</option>
+            </select>
+        </div>
+        <div class="form-group col-md-6">
+            <label for="formadepago">Forma de Pago</label>
+            <select id="formadepago" name="formadepago" class="form-control" required>
+                <option selected>Seleccione la forma de pago</option>
+                {% for i in metodospagos %}
+                <option value="{{i[0]}}">{{i[0]}}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+    <div class="form-row">
+        <div class="form-group col-md-12">
+            <label for="plan">Plan</label>
+            <select id="plan" name="plan" class="form-control" required>
+                <option selected>Seleccione plan de estudio</option>
+                <option value="Semanal">Semanal</option>
+                <option value="Quincenal">Quincenal</option>
+            </select>
+        </div>
+    </div>
+    <button type="submit" class="btn btn-primary">Aceptar</button>
 </form>
 
+<script>
+// Animación para el mensaje de error
+document.addEventListener('DOMContentLoaded', function() {
+    // Si hay un mensaje de error, hacer scroll hasta él
+    const alertElement = document.querySelector('.alert-danger');
+    if (alertElement) {
+        alertElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        
+        // Resaltar los campos relacionados con el conflicto
+        const diaValue = "{{ request.form.dia if request.form.dia else '' }}";
+        const horainicioValue = "{{ request.form.horainicio if request.form.horainicio else '' }}";
+        const horafinValue = "{{ request.form.horafin if request.form.horafin else '' }}";
+        
+        if (diaValue) {
+            const diaSelect = document.getElementById('dia');
+            if (diaSelect) {
+                diaSelect.style.borderColor = '#dc3545';
+                diaSelect.style.boxShadow = '0 0 0 0.2rem rgba(220, 53, 69, 0.25)';
+            }
+        }
+        
+        if (horainicioValue) {
+            const horainicioInput = document.getElementById('horainicio');
+            if (horainicioInput) {
+                horainicioInput.style.borderColor = '#dc3545';
+                horainicioInput.style.boxShadow = '0 0 0 0.2rem rgba(220, 53, 69, 0.25)';
+            }
+        }
+        
+        if (horafinValue) {
+            const horafinInput = document.getElementById('horafin');
+            if (horafinInput) {
+                horafinInput.style.borderColor = '#dc3545';
+                horafinInput.style.boxShadow = '0 0 0 0.2rem rgba(220, 53, 69, 0.25)';
+            }
+        }
+    }
+});
+</script>
 {% endblock %}

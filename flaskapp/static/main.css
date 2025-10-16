@@ -126,21 +126,21 @@ p {
 }
 
 .button1 {
-	background-color: white;
-	border: 1px solid #dddddd;
-	color: black;
-	padding: 15px;
-	text-align: left;
-	text-decoration: none;
-	display: inline-block;
-	font-size: 18.667px;
-	border-radius: 1px;
-	width: 90%;
-  }
+    background-color: white;
+    border: 1px solid #dddddd;
+    color: black;
+    padding: 15px;
+    text-align: left;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 18.667px;
+    border-radius: 1px;
+    width: 90%;
+}
 
-  .iconos {
-	float: right;
-	font-size: 25px;
-	color: #2C3A47;
-	width: 20px;
-  }
+.iconos {
+    float: right;
+    font-size: 25px;
+    color: #2C3A47;
+    width: 20px;
+}
