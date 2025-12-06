@@ -1046,35 +1046,52 @@ def registrarcheque():
 @app.route('/reportepdf/<id>', methods=['GET', 'POST'])
 def reportepdf(id):
     meses = [[1, "Enero"], [2, "Febrero"], [3, "Marzo"], [4, "Abril"], [5, "Mayo"], [6, "Junio"], [7, "Julio"], [8, "Agosto"], [9, "Septiembre"], [10, "Octubre"], [11, "Noviembre"], [12, "Diciembre"]]
-    today = datetime.datetime.today()
-    anio = int(today.year)
     try:
         conexion = pymysql.connect(host=Conhost, user=Conuser, password=Conpassword, db=Condb)
         try:
             with conexion.cursor() as cursor:
-                consulta = "SELECT c.idcatedratico, c.nombre, c.apellido, c.correo, c.telefono, n.abreviatura from catedratico c inner join nivelacademico n on c.idnivelacademico = n.idnivelacademico where c.idcatedratico = %s"
-                cursor.execute(consulta, (id))
+                consulta = f"SELECT c.idcatedratico, c.nombre, c.apellido, c.correo, c.telefono, n.abreviatura from catedratico c inner join nivelacademico n on c.idnivelacademico = n.idnivelacademico where c.idcatedratico = {id}"
+                cursor.execute(consulta)
             # Con fetchall traemos todas las filas
                 catedratico = cursor.fetchone()
+                consulta = f"SELECT year(p.fecharegistro) from periodos p inner join clase c on c.idclase = p.idclase where c.idcatedratico = {id} and p.idestado = 2 and p.liquidado = 0 group by year(p.fecharegistro) order by year(p.fecharegistro);"
+                cursor.execute(consulta)
+            # Con fetchall traemos todas las filas
+                anios = cursor.fetchall()
                 periodosmeses = []
                 totales = 0
-                for i in range(12):
-                    consulta = "SELECT count(fecha) from periodos p inner join clase c on p.idclase = c.idclase where p.idestado = 2 and p.liquidado = 0 and c.idcatedratico = %s and ((month(p.fecha) = %s and month(p.fecharegistro) = %s and year(p.fecha) = %s and year(p.fecharegistro) = %s) or (month(p.fecha) < %s and month(p.fecharegistro) = %s and day(p.fecharegistro) < 5 and year(p.fecha) = %s and year(p.fecharegistro) = %s) or (month(p.fecha) <> %s and year(p.fecha) < %s and month(p.fecharegistro) = %s and year(p.fecharegistro) = %s) or (month(p.fecha) < %s and year(p.fecha) = %s and month(p.fecharegistro) = %s and day(p.fecharegistro) >= 5 and year(p.fecharegistro) = %s));"
-                    cursor.execute(consulta, (id,i+1,i+1, anio, anio, i+1, i+2, anio, anio, i+1, anio, i+1, anio, i+1, anio, i+1, anio))
-                    num = cursor.fetchone()
-                    consulta = "SELECT c.nombre, c.horainicio, c.horafin, a.codigo, DATE_FORMAT(p.fecha,'%d/%m/%Y'), p.idperiodos, p.idestado, p.precio, c.seccion, DATE_FORMAT(p.fecharegistro,'%d/%m/%Y'), p.formadepago from clase c inner join carrera a on a.idcarrera = c.idcarrera inner join periodos p on p.idclase = c.idclase where c.idcatedratico = " + str(id) + " and p.idestado = 2 and p.liquidado = 0 and ((month(p.fecha) = " + str(i+1) + " and month(p.fecharegistro) = " + str(i+1) + " and year(p.fecha) = " + str(anio) + " and year(p.fecharegistro) = " + str(anio) + ") or (month(p.fecha) < " + str(i+1) + " and month(p.fecharegistro) = " + str(i+2) + " and day(p.fecharegistro) < 5 and year(p.fecha) = " + str(anio) + " and year(p.fecharegistro) = " + str(anio) + ") or (month(p.fecha) <> " + str(i+1) + " and year(p.fecha) < " + str(anio) + " and month(p.fecharegistro) = " + str(i+1) + " and year(p.fecharegistro) = " + str(anio) + ") or (month(p.fecha) < " + str(i+1) + " and year(p.fecha) = " + str(anio) + " and month(p.fecharegistro) = " + str(i+1) + " and day(p.fecharegistro) >= 5 and year(p.fecharegistro) = " + str(anio) + ")) order by p.fecha"
-                    cursor.execute(consulta)
-                    periodos = cursor.fetchall()
-                    total = 0
-                    for j in periodos:
-                        total = total + float(j[7])
-                    aux = []
-                    aux.append(i)
-                    aux.append(num[0])
-                    aux.append(periodos)
-                    aux.append(total)
-                    periodosmeses.append(aux)
-                    totales = totales + total
+                for i in anios:
+                    for j in meses:
+                        consulta = f'select a.idcarrera, p.precio from carrera a inner join clase c on a.idcarrera = c.idcarrera inner join periodos p on p.idclase = c.idclase where c.idcatedratico = {id} and p.idestado = 2 and p.liquidado = 0 and year(p.fecharegistro) = {i[0]} and month(p.fecharegistro) = {j[0]} group by a.codigo, p.precio order by a.codigo asc, p.precio asc;'
+                        cursor.execute(consulta)
+                        carreras = cursor.fetchall()
+                        for a in carreras:
+                            consulta = f'SELECT count(fecha) from periodos p inner join clase c on p.idclase = c.idclase where p.idestado = 2 and p.liquidado = 0 and c.idcatedratico = {id} and year(p.fecharegistro) = {i[0]} and month(p.fecharegistro) = {j[0]} and c.idcarrera = {a[0]} and p.precio = {a[1]};'
+                            cursor.execute(consulta)
+                            num = cursor.fetchone()
+                            consulta = f'SELECT count(fecha) from periodos p inner join clase c on p.idclase = c.idclase where p.liquidado = 0 and c.idcatedratico = {id} and c.idcarrera = {a[0]} and year(p.fecha) = {i[0]} and month(p.fecha) = {j[0]} and p.precio = {a[1]};'
+                            cursor.execute(consulta)
+                            num1 = cursor.fetchone()
+                            dif = int(num1[0]) - int(num[0])
+                            consulta = f"SELECT c.nombre, c.horainicio, c.horafin, a.codigo, DATE_FORMAT(p.fecha,'%d/%m/%Y'), p.idperiodos, p.idestado, p.precio, c.seccion, DATE_FORMAT(p.fecharegistro,'%d/%m/%Y'), p.formadepago, p.comentario from clase c inner join carrera a on a.idcarrera = c.idcarrera inner join periodos p on p.idclase = c.idclase where p.idestado = 2 and p.liquidado = 0 and c.idcatedratico = {id} and year(p.fecharegistro) = {i[0]} and month(p.fecharegistro) = {j[0]} and c.idcarrera = {a[0]} and p.precio = {a[1]} order by p.fecha;"
+                            cursor.execute(consulta)
+                            periodos = cursor.fetchall()
+                            total = 0
+                            for k in periodos:
+                                total = total + float(k[7])
+                            aux = []
+                            if int(num[0]) > 0:
+                                aux.append(i[0])
+                                aux.append(j)
+                                aux.append(num[0])
+                                aux.append(periodos)
+                                aux.append(total)
+                                aux.append(periodos[0][3])
+                                aux.append(num1[0])
+                                aux.append(dif)
+                                aux.append(a[1])
+                                periodosmeses.append(aux)
+                                totales = totales + total
         finally:
             conexion.close()
     except (pymysql.err.OperationalError, pymysql.err.InternalError) as e:
