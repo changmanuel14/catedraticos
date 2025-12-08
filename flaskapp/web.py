@@ -1096,6 +1096,7 @@ def reportepdf(id):
             conexion.close()
     except (pymysql.err.OperationalError, pymysql.err.InternalError) as e:
         print("Ocurrió un error al conectar: ", e)
+    print(periodosmeses)
     html = render_template('reportepdf.html', title="Monto a Facturar", catedratico=catedratico, periodosmeses = periodosmeses, meses=meses, totales = totales)
     return render_pdf(HTML(string=html))
 
