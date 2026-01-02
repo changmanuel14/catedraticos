@@ -936,18 +936,18 @@ def montofact(id):
                 totales = 0
                 for i in anios:
                     for j in meses:
-                        consulta = f'select a.idcarrera, p.precio from carrera a inner join clase c on a.idcarrera = c.idcarrera inner join periodos p on p.idclase = c.idclase where c.idcatedratico = {id} and p.idestado = 2 and p.liquidado = 0 and year(p.fecharegistro) = {i[0]} and month(p.fecharegistro) = {j[0]} group by a.codigo, p.precio order by a.codigo asc, p.precio asc;'
+                        consulta = f'select a.idcarrera, ROUND(p.precio, 2) from carrera a inner join clase c on a.idcarrera = c.idcarrera inner join periodos p on p.idclase = c.idclase where c.idcatedratico = {id} and p.idestado = 2 and p.liquidado = 0 and year(p.fecharegistro) = {i[0]} and month(p.fecharegistro) = {j[0]} group by a.codigo, ROUND(p.precio, 2) order by a.codigo asc, ROUND(p.precio, 2) asc;'
                         cursor.execute(consulta)
                         carreras = cursor.fetchall()
                         for a in carreras:
-                            consulta = f'SELECT count(fecha) from periodos p inner join clase c on p.idclase = c.idclase where p.idestado = 2 and p.liquidado = 0 and c.idcatedratico = {id} and year(p.fecharegistro) = {i[0]} and month(p.fecharegistro) = {j[0]} and c.idcarrera = {a[0]} and p.precio = {a[1]};'
+                            consulta = f'SELECT count(fecha) from periodos p inner join clase c on p.idclase = c.idclase where p.idestado = 2 and p.liquidado = 0 and c.idcatedratico = {id} and year(p.fecharegistro) = {i[0]} and month(p.fecharegistro) = {j[0]} and c.idcarrera = {a[0]} and ROUND(p.precio, 2) = {a[1]};'
                             cursor.execute(consulta)
                             num = cursor.fetchone()
-                            consulta = f'SELECT count(fecha) from periodos p inner join clase c on p.idclase = c.idclase where p.liquidado = 0 and c.idcatedratico = {id} and c.idcarrera = {a[0]} and year(p.fecha) = {i[0]} and month(p.fecha) = {j[0]} and p.precio = {a[1]};'
+                            consulta = f'SELECT count(fecha) from periodos p inner join clase c on p.idclase = c.idclase where p.liquidado = 0 and c.idcatedratico = {id} and c.idcarrera = {a[0]} and year(p.fecha) = {i[0]} and month(p.fecha) = {j[0]} and ROUND(p.precio, 2) = {a[1]};'
                             cursor.execute(consulta)
                             num1 = cursor.fetchone()
                             dif = int(num1[0]) - int(num[0])
-                            consulta = f"SELECT c.nombre, c.horainicio, c.horafin, a.codigo, DATE_FORMAT(p.fecha,'%d/%m/%Y'), p.idperiodos, p.idestado, p.precio, c.seccion, DATE_FORMAT(p.fecharegistro,'%d/%m/%Y'), p.formadepago, p.comentario from clase c inner join carrera a on a.idcarrera = c.idcarrera inner join periodos p on p.idclase = c.idclase where p.idestado = 2 and p.liquidado = 0 and c.idcatedratico = {id} and year(p.fecharegistro) = {i[0]} and month(p.fecharegistro) = {j[0]} and c.idcarrera = {a[0]} and p.precio = {a[1]} order by p.fecha;"
+                            consulta = f"SELECT c.nombre, c.horainicio, c.horafin, a.codigo, DATE_FORMAT(p.fecha,'%d/%m/%Y'), p.idperiodos, p.idestado, ROUND(p.precio, 2), c.seccion, DATE_FORMAT(p.fecharegistro,'%d/%m/%Y'), p.formadepago, p.comentario from clase c inner join carrera a on a.idcarrera = c.idcarrera inner join periodos p on p.idclase = c.idclase where p.idestado = 2 and p.liquidado = 0 and c.idcatedratico = {id} and year(p.fecharegistro) = {i[0]} and month(p.fecharegistro) = {j[0]} and c.idcarrera = {a[0]} and ROUND(p.precio, 2) = {a[1]} order by p.fecha;"
                             cursor.execute(consulta)
                             periodos = cursor.fetchall()
                             total = 0
@@ -1015,7 +1015,7 @@ def registrarcheque():
         conexion = pymysql.connect(host=Conhost, user=Conuser, password=Conpassword, db=Condb)
         try:
             with conexion.cursor() as cursor:
-                consulta = "SELECT c.idcatedratico, c.nombre, c.apellido, n.abreviatura, sum(p.precio), p.factura, p.cheque from catedratico c inner join nivelacademico n on c.idnivelacademico = n.idnivelacademico inner join clase a on c.idcatedratico = a.idcatedratico inner join periodos p on a.idclase = p.idclase where p.factura != '0' and (p.cheque = '0' or p.cheque IS Null) group by p.factura, c.nombre, c.apellido, n.abreviatura order by n.abreviatura, c.nombre;"
+                consulta = "SELECT c.idcatedratico, c.nombre, c.apellido, n.abreviatura, round(sum(p.precio),2), p.factura, p.cheque from catedratico c inner join nivelacademico n on c.idnivelacademico = n.idnivelacademico inner join clase a on c.idcatedratico = a.idcatedratico inner join periodos p on a.idclase = p.idclase where p.factura != '0' and (p.cheque = '0' or p.cheque IS Null) group by p.factura, c.nombre, c.apellido, n.abreviatura order by n.abreviatura, c.nombre;"
                 cursor.execute(consulta)
             # Con fetchall traemos todas las filas
                 catedraticos = cursor.fetchall()
@@ -1062,18 +1062,18 @@ def reportepdf(id):
                 totales = 0
                 for i in anios:
                     for j in meses:
-                        consulta = f'select a.idcarrera, p.precio from carrera a inner join clase c on a.idcarrera = c.idcarrera inner join periodos p on p.idclase = c.idclase where c.idcatedratico = {id} and p.idestado = 2 and p.liquidado = 0 and year(p.fecharegistro) = {i[0]} and month(p.fecharegistro) = {j[0]} group by a.codigo, p.precio order by a.codigo asc, p.precio asc;'
+                        consulta = f'select a.idcarrera, ROUND(p.precio, 2) from carrera a inner join clase c on a.idcarrera = c.idcarrera inner join periodos p on p.idclase = c.idclase where c.idcatedratico = {id} and p.idestado = 2 and p.liquidado = 0 and year(p.fecharegistro) = {i[0]} and month(p.fecharegistro) = {j[0]} group by a.codigo, ROUND(p.precio, 2) order by a.codigo asc, ROUND(p.precio, 2) asc;'
                         cursor.execute(consulta)
                         carreras = cursor.fetchall()
                         for a in carreras:
-                            consulta = f'SELECT count(fecha) from periodos p inner join clase c on p.idclase = c.idclase where p.idestado = 2 and p.liquidado = 0 and c.idcatedratico = {id} and year(p.fecharegistro) = {i[0]} and month(p.fecharegistro) = {j[0]} and c.idcarrera = {a[0]} and p.precio = {a[1]};'
+                            consulta = f'SELECT count(fecha) from periodos p inner join clase c on p.idclase = c.idclase where p.idestado = 2 and p.liquidado = 0 and c.idcatedratico = {id} and year(p.fecharegistro) = {i[0]} and month(p.fecharegistro) = {j[0]} and c.idcarrera = {a[0]} and ROUND(p.precio, 2) = {a[1]};'
                             cursor.execute(consulta)
                             num = cursor.fetchone()
-                            consulta = f'SELECT count(fecha) from periodos p inner join clase c on p.idclase = c.idclase where p.liquidado = 0 and c.idcatedratico = {id} and c.idcarrera = {a[0]} and year(p.fecha) = {i[0]} and month(p.fecha) = {j[0]} and p.precio = {a[1]};'
+                            consulta = f'SELECT count(fecha) from periodos p inner join clase c on p.idclase = c.idclase where p.liquidado = 0 and c.idcatedratico = {id} and c.idcarrera = {a[0]} and year(p.fecha) = {i[0]} and month(p.fecha) = {j[0]} and ROUND(p.precio, 2) = {a[1]};'
                             cursor.execute(consulta)
                             num1 = cursor.fetchone()
                             dif = int(num1[0]) - int(num[0])
-                            consulta = f"SELECT c.nombre, c.horainicio, c.horafin, a.codigo, DATE_FORMAT(p.fecha,'%d/%m/%Y'), p.idperiodos, p.idestado, p.precio, c.seccion, DATE_FORMAT(p.fecharegistro,'%d/%m/%Y'), p.formadepago, p.comentario from clase c inner join carrera a on a.idcarrera = c.idcarrera inner join periodos p on p.idclase = c.idclase where p.idestado = 2 and p.liquidado = 0 and c.idcatedratico = {id} and year(p.fecharegistro) = {i[0]} and month(p.fecharegistro) = {j[0]} and c.idcarrera = {a[0]} and p.precio = {a[1]} order by p.fecha;"
+                            consulta = f"SELECT c.nombre, c.horainicio, c.horafin, a.codigo, DATE_FORMAT(p.fecha,'%d/%m/%Y'), p.idperiodos, p.idestado, ROUND(p.precio, 2), c.seccion, DATE_FORMAT(p.fecharegistro,'%d/%m/%Y'), p.formadepago, p.comentario from clase c inner join carrera a on a.idcarrera = c.idcarrera inner join periodos p on p.idclase = c.idclase where p.idestado = 2 and p.liquidado = 0 and c.idcatedratico = {id} and year(p.fecharegistro) = {i[0]} and month(p.fecharegistro) = {j[0]} and c.idcarrera = {a[0]} and ROUND(p.precio, 2) = {a[1]} order by p.fecha;"
                             cursor.execute(consulta)
                             periodos = cursor.fetchall()
                             total = 0
