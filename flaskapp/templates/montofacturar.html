@@ -38,10 +38,9 @@
 		<td>{{catedraticos[i][1]}}</td>
 		<td>{{catedraticos[i][2]}}</td>
 		<td>{{catedraticos[i][4]}}</td>
-		<td>{{data[i][0]}}</td>
-		<td>{{data[i][1]}}</td>
-		<td>{{data[i][2]}} </td>
-
+		<td>{{data[i][0] | round(2) }}</td>
+		<td>{{data[i][1] | round(2) }}</td>
+		<td>{{data[i][2] | round(2) }} </td>
 		<td><a href="/montofact/{{catedraticos[i][0]}}"><button class="btn btn-info">Ver Montos</button></a></td>
 	</tr>
 
