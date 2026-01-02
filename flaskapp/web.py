@@ -792,10 +792,10 @@ def montofacturarpdf():
                 cantidad = len(catedraticos)
                 data = []
                 for i in catedraticos:
-                    consulta = f"SELECT sum(p.precio) from periodos p inner join clase c on c.idclase = p.idclase where c.idcatedratico = {i[0]} and p.formadepago = '{i[4]}' and p.idestado = 2 and p.liquidado = 0 and p.fecharegistro <= LAST_DAY(DATE_SUB(CURDATE(), INTERVAL 2 MONTH));"
+                    consulta = f"SELECT round(sum(p.precio), 2) from periodos p inner join clase c on c.idclase = p.idclase where c.idcatedratico = {i[0]} and p.formadepago = '{i[4]}' and p.idestado = 2 and p.liquidado = 0 and p.fecharegistro <= LAST_DAY(DATE_SUB(CURDATE(), INTERVAL 2 MONTH));"
                     cursor.execute(consulta)
                     total = cursor.fetchone()
-                    consulta = f"SELECT sum(p.precio) from periodos p inner join clase c on c.idclase = p.idclase where c.idcatedratico = {i[0]} and p.formadepago = '{i[4]}' and p.idestado = 2 and p.liquidado = 0 and p.fecharegistro <= LAST_DAY(DATE_SUB(CURDATE(), INTERVAL 1 MONTH)) and p.fecharegistro > LAST_DAY(DATE_SUB(CURDATE(), INTERVAL 2 MONTH));"
+                    consulta = f"SELECT round(sum(p.precio), 2) from periodos p inner join clase c on c.idclase = p.idclase where c.idcatedratico = {i[0]} and p.formadepago = '{i[4]}' and p.idestado = 2 and p.liquidado = 0 and p.fecharegistro <= LAST_DAY(DATE_SUB(CURDATE(), INTERVAL 1 MONTH)) and p.fecharegistro > LAST_DAY(DATE_SUB(CURDATE(), INTERVAL 2 MONTH));"
                     cursor.execute(consulta)
                     totalmes = cursor.fetchone()
                     try:
@@ -828,10 +828,10 @@ def montofacturarexcel():
                 cantidad = len(catedraticos)
                 data = []
                 for i in catedraticos:
-                    consulta = f"SELECT sum(p.precio) from periodos p inner join clase c on c.idclase = p.idclase where c.idcatedratico = {i[0]} and p.formadepago = '{i[4]}' and p.idestado = 2 and p.liquidado = 0 and p.fecharegistro <= LAST_DAY(DATE_SUB(CURDATE(), INTERVAL 2 MONTH));"
+                    consulta = f"SELECT round(sum(p.precio), 2) from periodos p inner join clase c on c.idclase = p.idclase where c.idcatedratico = {i[0]} and p.formadepago = '{i[4]}' and p.idestado = 2 and p.liquidado = 0 and p.fecharegistro <= LAST_DAY(DATE_SUB(CURDATE(), INTERVAL 2 MONTH));"
                     cursor.execute(consulta)
                     total = cursor.fetchone()
-                    consulta = f"SELECT sum(p.precio) from periodos p inner join clase c on c.idclase = p.idclase where c.idcatedratico = {i[0]} and p.formadepago = '{i[4]}' and p.idestado = 2 and p.liquidado = 0 and p.fecharegistro <= LAST_DAY(DATE_SUB(CURDATE(), INTERVAL 1 MONTH)) and p.fecharegistro > LAST_DAY(DATE_SUB(CURDATE(), INTERVAL 2 MONTH));"
+                    consulta = f"SELECT round(sum(p.precio), 2) from periodos p inner join clase c on c.idclase = p.idclase where c.idcatedratico = {i[0]} and p.formadepago = '{i[4]}' and p.idestado = 2 and p.liquidado = 0 and p.fecharegistro <= LAST_DAY(DATE_SUB(CURDATE(), INTERVAL 1 MONTH)) and p.fecharegistro > LAST_DAY(DATE_SUB(CURDATE(), INTERVAL 2 MONTH));"
                     cursor.execute(consulta)
                     totalmes = cursor.fetchone()
                     try:
