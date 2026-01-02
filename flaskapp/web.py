@@ -963,7 +963,7 @@ def montofact(id):
                                 aux.append(periodos[0][3])
                                 aux.append(num1[0])
                                 aux.append(dif)
-                                aux.append(a[1])
+                                aux.append(round(a[1]), 2)
                                 periodosmeses.append(aux)
                                 totales = totales + total
                                 totales = round(totales,2)
@@ -1090,7 +1090,7 @@ def reportepdf(id):
                                 aux.append(periodos[0][3])
                                 aux.append(num1[0])
                                 aux.append(dif)
-                                aux.append(a[1])
+                                aux.append(round(a[1]), 2)
                                 periodosmeses.append(aux)
                                 totales = totales + total
                                 totales = round(totales, 2)
