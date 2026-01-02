@@ -966,6 +966,7 @@ def montofact(id):
                                 aux.append(a[1])
                                 periodosmeses.append(aux)
                                 totales = totales + total
+                                totales = round(totales,2)
         finally:
             conexion.close()
     except (pymysql.err.OperationalError, pymysql.err.InternalError) as e:
@@ -1092,6 +1093,7 @@ def reportepdf(id):
                                 aux.append(a[1])
                                 periodosmeses.append(aux)
                                 totales = totales + total
+                                totales = round(totales, 2)
         finally:
             conexion.close()
     except (pymysql.err.OperationalError, pymysql.err.InternalError) as e:
